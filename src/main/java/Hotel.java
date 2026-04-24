@@ -1,3 +1,6 @@
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 public class Hotel {
 
     int id;
