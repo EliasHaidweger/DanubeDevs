@@ -138,7 +138,7 @@ public class AddHotelForm extends JFrame {
             //Speichern über Utility Klasse
             HotelUtility.saveHotel(newHotel);
             //Bestätigung
-            JOptionPane.showMessageDialog(this, "Hotel has been saved successfully" + newId);
+            JOptionPane.showMessageDialog(this, "Hotel has been saved successfully " + newId);
             //Schließen und neues Fenster zum hinzufügen
             dispose();
             new AddHotelForm();

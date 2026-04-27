@@ -696,3 +696,4 @@ id,category,name,owner,contact,address,city,cityCode,phone,noRooms,noBeds
 635,"**","Gwörthwirt","Ruchinger Szonja","Silinger Thalia","Gwörth 3","Kasten","3072","0610245",2,11
 447,"**","Schlaffass - Schlafen im Holzfass","Pietka Olivia-Chelsea","Krojer Seila","Dumba Park 1","Tattendorf","2523","6726807",20,141
 297,"*","Dorfwirtshaus Rauch","Lezak Celio","Ploub Mehvan","Eschabruck 11","Eschabruck","3533","8635887",59,73
+"697","gh","jb,cd","x","d","d","d","dd","d","2","3"
