@@ -4,7 +4,9 @@ import javax.swing.event.CaretListener;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class EditTransactionalData extends JFrame {
     //window --> JFrame
@@ -24,8 +26,9 @@ public class EditTransactionalData extends JFrame {
         //Screen dem Hotelobjekt übergeben wird
         setTitle("Edit Transaction Data");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(500, 500);
+        setSize(700, 700);
         setLocationRelativeTo(null); // in der Mitte vom Screen
+        setIconImage(new ImageIcon("src/main/resources/Logo.jpg").getImage());
 
         setupUI(hotel);//Methodenaufruf und übergabe
 
@@ -70,7 +73,7 @@ public class EditTransactionalData extends JFrame {
 
         saveButton.setEnabled(true);
 
-        mainPanel.add(new LogoComponent(),  BorderLayout.NORTH);
+        mainPanel.add(new LogoComponent(), BorderLayout.PAGE_START);
         mainPanel.add(inputPanel, BorderLayout.CENTER);
         mainPanel.add(saveButton, BorderLayout.SOUTH);
 
@@ -83,28 +86,59 @@ public class EditTransactionalData extends JFrame {
         saveButton.addActionListener(e -> validateInputs());// wenn eingabe passt, button und weiter zur handle safe methode
     }
 
-    private void handleSave() {
-        //TODO: save occupancy to Database
-        //
-    }
-
     //login window: es können nicht mehr betten belegt werden, als vorhanden. string in integer umwandeln zum vergleich
-    private void validateInputs() {//weil in der klasse, nicht nötig zu +bergeben
+    private void validateInputs() {//weil in der klasse, nicht nötig zu übergeben
         try {
-            if (Integer.parseInt(usedRoomsField.getText()) > Integer.parseInt(roomField.getText())) {
+            if (Integer.parseInt(usedRoomsField.getText().trim()) > Integer.parseInt(roomField.getText().trim())) {
                 JOptionPane.showMessageDialog(this, "The number of usedRooms has to be lower than the existing one's.", "Validation Error", JOptionPane.WARNING_MESSAGE);
-            } else if (Integer.parseInt(usedBedField.getText()) > Integer.parseInt(bedField.getText())) {
+            } else if (Integer.parseInt(usedBedField.getText().trim()) > Integer.parseInt(bedField.getText().trim())) {
                 JOptionPane.showMessageDialog(this, "The number of usedBeds has to be lower than the existing one's.", "Validation Error", JOptionPane.WARNING_MESSAGE);
-            } else if (Integer.parseInt(yearField.getText()) < 1970) {
+            } else if (Integer.parseInt(yearField.getText().trim()) < 1970) {
                 JOptionPane.showMessageDialog(this, "Year has to be at least 1970", "Validation Error", JOptionPane.WARNING_MESSAGE);
-            } else if (Integer.parseInt(monthField.getText())<1||Integer.parseInt(monthField.getText())>12) {
+            } else if (Integer.parseInt(monthField.getText().trim()) < 1 || Integer.parseInt(monthField.getText().trim()) > 12) {
                 JOptionPane.showMessageDialog(this, "This month does not exist.", "Validation Error", JOptionPane.WARNING_MESSAGE);
             } else {
                 handleSave();
             }
-        } catch (NumberFormatException e) {//wenn parseInt nciht zahlen sieht wird exception geworfen nämlich numberformatexception
+        } catch (
+                NumberFormatException e) {//wenn parseInt nciht zahlen sieht wird exception geworfen nämlich numberformatexception
             JOptionPane.showMessageDialog(this, "Please enter a number.", "Validation Error", JOptionPane.WARNING_MESSAGE);
         }
 
     }
+
+    private void handleSave() {
+        //saves occupancy to Database
+        try {
+            ArrayList<Occupancies> occupancies = OccupancyUtility.loadOccupanciesFromFile();
+
+            for (Occupancies occupancy : occupancies) {
+                if (occupancy.id == Integer.parseInt(idField.getText())) {// da ist ein = = sieht nur aus wie ==
+                    if (occupancy.year == Integer.parseInt(yearField.getText())) {
+                        if (occupancy.month == Integer.parseInt(monthField.getText())) {
+                            JOptionPane.showMessageDialog(this, "Error: There is already an entry in the database for this month.");
+                            return;//abbruch von handlesave
+                        }
+                    }
+                }
+            }
+            Occupancies o = new Occupancies(// beim übergeben wird noch umgewandelt
+                    //id,rooms,usedrooms,beds,usedbeds,year,month
+                    Integer.parseInt(idField.getText().trim()),//gib leerzeichen weg --> userfreundlich
+                    Integer.parseInt(roomField.getText().trim()),
+                    Integer.parseInt(usedRoomsField.getText().trim()),
+                    Integer.parseInt(bedField.getText().trim()),
+                    Integer.parseInt(usedBedField.getText().trim()),
+                    Integer.parseInt(yearField.getText().trim()),
+                    Integer.parseInt(monthField.getText().trim())
+            );
+            OccupancyUtility.saveOccupancies(o);
+            JOptionPane.showMessageDialog(this, "Occupancy has been saved successfully. ");
+            dispose();//schließen
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+        }
+    }
+
 }
