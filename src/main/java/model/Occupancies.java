@@ -1,3 +1,5 @@
+package model;
+
 public class Occupancies {
 
     int id;
