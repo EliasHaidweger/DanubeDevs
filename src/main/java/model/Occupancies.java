@@ -1,12 +1,11 @@
 package model;
 
-public class Occupancies {
-
-    int id;
-    int rooms;
-    int usedRooms;
-    int beds;
-    int usedBeds;
-    int year;
-    int month;
+public record Occupancy(
+        int hid,
+        int rooms,
+        int usedRooms,
+        int usedBeds,
+        int year,
+        int month
+) {
 }
