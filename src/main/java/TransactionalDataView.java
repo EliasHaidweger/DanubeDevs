@@ -13,8 +13,8 @@ import java.util.Scanner;
  *   AC-10-2: FROM and TO month/year filters to limit the results shown
  *   AC-10-3: All shown records match the data for the selected hotel and date range
  * Structure layout documentation:
- *   GUI (lines 20-51) -> initComponents (lines 53-99) -> addComponents (liens 101-128)
- *  -> Filter (lines 131-190)-> Scanner for txt files (lines 197-272)
+ *   GUI (lines 21-51) -> initComponents (lines 53-99) -> addComponents (liens 101-129)
+ *  -> Filter (lines 131-190)-> Scanners for txt files (lines 197-276)
  *
  * ToDo: swap local data to the database
  */
@@ -34,7 +34,7 @@ public class TransactionalDataView extends JFrame {
     private DefaultTableModel model;
 
     public TransactionalDataView() {
-        loadHotels();// Read hotels occupancies from the txt files lines 296 & 242
+        loadHotels();// Read hotels & occupancies from the txt files
         loadOccupancies();
         defineFrame();
         initComponents();
@@ -240,9 +240,9 @@ public class TransactionalDataView extends JFrame {
         }
     }
 
-    /*
-     * Same scanner as before only now form the occupancies txt
-     */
+
+     // Same scanner as before only now form the occupancies txt
+
     private void loadOccupancies() {
         occupancies = new ArrayList<>();
 
