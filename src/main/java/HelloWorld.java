@@ -15,7 +15,7 @@ public class HelloWorld {
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
-
+        /* heelo*/
         File occupancies= new File("src/main/resources/occupancies.txt");
         Scanner scanner2 = null;
         try {
