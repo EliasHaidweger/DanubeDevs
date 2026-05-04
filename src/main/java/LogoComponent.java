@@ -15,6 +15,7 @@ import java.io.IOException;
  *   LogoComponent (JLabel subclass) -> loadImage (ImageIO) -> scaleImage (getScaledInstance) -> setIcon (ImageIcon)
  */
 
+
 public class LogoComponent extends JLabel {
 
     //TO DO: kopiere das hier hinein in dein Window

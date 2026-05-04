@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
+
 /*
  * View window for adding new transactional occupancy data (rooms, beds, month/year) per hotel.
  * US06

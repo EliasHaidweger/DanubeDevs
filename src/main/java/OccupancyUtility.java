@@ -18,6 +18,7 @@ import java.util.Scanner;
  *   GUI (constructor + setupUI) -> setupListeners -> validateInputs -> handleSave -> OccupancyUtility (scanners for txt files)
  */
 
+
 public class OccupancyUtility {
     private static final String PATH = "src/main/resources/occupancies.txt";
 

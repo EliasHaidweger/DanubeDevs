@@ -1,10 +1,12 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
+
 /*
  * Starts the main window for editing transactional occupancy data (rooms, beds, month/year).
  * US06
  */
+
 public class MainWindow {
     public static void main(String[] args) {
 
