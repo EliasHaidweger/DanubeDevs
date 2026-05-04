@@ -5,67 +5,38 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+/*
+ * Reusable logo component that displays the NOE-TO logo scaled without distortion in the UI.
+ * US17
+ *   AC-17-1: The logo appears on all main windows
+ *   AC-17-2: Written copyright clearance is saved before the logo is added
+ *   AC-17-3: The logo is not distorted (scaled proportionally)
+ * Structure layout documentation:
+ *   LogoComponent (JLabel subclass) -> loadImage (ImageIO) -> scaleImage (getScaledInstance) -> setIcon (ImageIcon)
+ */
+
 public class LogoComponent extends JLabel {
 
-    //TO DO: kopiere das hier hinein in dein window
+    //TO DO: kopiere das hier hinein in dein Window
     //mainPanel.add(new LogoComponent(),  BorderLayout.NORTH);
 
     public LogoComponent() {
-        BufferedImage img = null;
+        BufferedImage img = null; //BufferedImage ist das Logo, welches noch skaliert werden muss
 
         try {
-            img = ImageIO.read(new File("src/main/resources/Logo.jpg"));
+            img = ImageIO.read(new File("src/main/resources/Logo.jpg"));//Bild laden
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        /*
+        Bildskalierung: das Bild auf eine Höhe von 80 Pixel skalieren, Breite automatisch anpassen (-1),
+            damit das Bild nicht verzerrt wird und in der Breite proportional mit skaliert
+            Image.SCALE_SMOOTH sorgt für eine hochwertigere, weichere Skalierung
+         */
         Image scaled = img.getScaledInstance(-1, 80, Image.SCALE_SMOOTH);
+        /*Icon setzen: aus dem skalierten Bild ein ImageIcon erstellen und als Icon dieses JLabels festlegen
+            Damit wird der JLabel zum Logo in der Größe 80px hoch, proportional skaliert*/
         setIcon(new ImageIcon(scaled));
+
     }
 }
-/*import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import javax.imageio.ImageIO;
-import javax.swing.JComponent;
-import javax.swing.JOptionPane;
-
-public class LogoComponent extends JComponent {
-    private BufferedImage originalImage;// original
-    private Image scaledImage;//angepasstes
-
-    public LogoComponent() {
-        try {
-            originalImage = ImageIO.read(new java.io.File("src/main/resources/Logo.jpg")); // Bild reinladen
-            updateScaledImage(); //methodenaufruf
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Logo.jpg nicht gefunden: " + e.getMessage(), "Fehler", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void updateScaledImage() {
-        if (originalImage != null) {//wenn vorhanden
-            scaledImage = originalImage.getScaledInstance(-1, 80, Image.SCALE_SMOOTH);//methoden defintion
-        } //breite ist variabel > image ratio beibehalten während 80px hoch
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        if (scaledImage != null) {
-            Graphics2D g2d = (Graphics2D) g;
-            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-            g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-
-            // **Kein vertikales Zentrieren** - Bild oben links, aber Panel passt sich an
-            g2d.drawImage(scaledImage, 0, 0, this); //(0,0 links oben)
-        }
-    }
-
-    @Override
-    public Dimension getPreferredSize() {
-        if (scaledImage != null) {
-            return new Dimension(scaledImage.getWidth(null), scaledImage.getHeight(null));
-        }
-        return new Dimension(250, 80);
-    }
-}*/
