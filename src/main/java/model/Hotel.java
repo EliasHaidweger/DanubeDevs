@@ -1,16 +1,19 @@
 package model;
 
-public record Hotel(
-        int id,
-        int noRooms,
-        int noBeds,
-        String category,
-        String name,
-        String owner,
-        String contact,
-        String address,
-        String city,
-        String cityCode,
-        String phone,
-        String tags
-) {}
+public class Hotel {
+    public int id;
+    public String category;
+    public String name;
+    public String city;
+    public Integer noRooms;
+    public Integer noBeds;
+
+    public Hotel(int id, String category, String name, String city, Integer noRooms, Integer noBeds) {
+        this.id = id;
+        this.category = category;
+        this.name = name;
+        this.city = city;
+        this.noRooms = noRooms;
+        this.noBeds = noBeds;
+    }
+}
