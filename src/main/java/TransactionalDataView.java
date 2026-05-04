@@ -14,7 +14,7 @@ import java.util.Scanner;
  *   AC-10-3: All shown records match the data for the selected hotel and date range
  * Structure layout documentation:
  *   GUI (lines 21-51) -> initComponents (lines 53-99) -> addComponents (liens 101-129)
- *  -> Filter (lines 131-190)-> Scanners for txt files (lines 197-276)
+ *  -> Filter (lines 131-190)-> Scanners for txt files (lines 197-276).
  *
  * ToDo: swap local data to the database
  */
