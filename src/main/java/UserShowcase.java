@@ -8,8 +8,11 @@ public class UserShowcase {
     public static void main(String[] args) {
 
         line("CREATE");
-        Users p = create("Martin", 45, Benutzerrolle.SENIOR);
-        line(p.toString());
+        //Users p = create("Martin", 45, Benutzerrolle.SENIOR);
+        //line(p.toString());
+
+        Users m = create("Max", 34);
+        line(m.toString());
 
 /*
         line("GET BY ID");
@@ -34,9 +37,9 @@ public class UserShowcase {
         sf.close();
     }
 
-    static Users create(String v, int  n, Benutzerrolle e) {
-        Users p = Users.builder().name(v).age(n).role(e).build();
-
+    static Users create(String v, int  n ) {
+        //Users p = Users.builder().name(v).age(n).role(e).build();
+        Users p = Users.builder().name(v).age(n).build();
         try (Session s = sf.openSession()) {
             Transaction tx = s.beginTransaction();
 
