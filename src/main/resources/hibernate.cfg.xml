@@ -26,7 +26,8 @@
         <property name="hibernate.current_session_context_class">thread</property>
 
         <!-- Entity Mapping -->
-        <mapping class="java.Person"/>
+        <!--<mapping class="Hotelnew"/>-->
+        <mapping class="Users"/>
 
 
     </session-factory>

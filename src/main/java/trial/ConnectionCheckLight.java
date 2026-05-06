@@ -14,9 +14,9 @@ public class ConnectionCheckLight {
 
 
     public static void checkDatabase() {
-        String url = "jdbc:sqlserver://185.119.119.126:1433;databaseName=SP_DEUTSCH;encrypt=true;trustServerCertificate=true";
-        String user = "johndoe";
-        String password = "johndoe";
+        String url = "jdbc:sqlserver://185.119.119.126:1433;databaseName=DanubeDevs;encrypt=true;trustServerCertificate=true";
+        String user = "danube";
+        String password = "danube";
 
         try (Connection con = DriverManager.getConnection(url, user, password)) {
             System.out.println("DB Verbindung OK");

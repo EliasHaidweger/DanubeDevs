@@ -2,17 +2,13 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
-import java.util.List;
-
-public class PersonCrudShowcase {
-
-
+public class UserShowcase {
     private static final SessionFactory sf = HibernateUtil.getSessionFactory();
 
     public static void main(String[] args) {
 
         line("CREATE");
-        Hotelnew p = create("Besthotel", "Deutsch", "123456", "Wien");
+        Users p = create("Martin", 45, Benutzerrolle.SENIOR);
         line(p.toString());
 
 /*
@@ -38,8 +34,8 @@ public class PersonCrudShowcase {
         sf.close();
     }
 
-    static Hotelnew create(String v, String n, String e, String a) {
-        Hotelnew p = Hotelnew.builder().name(v).owner(n).phone(e).city(a).build();
+    static Users create(String v, int  n, Benutzerrolle e) {
+        Users p = Users.builder().name(v).age(n).role(e).build();
 
         try (Session s = sf.openSession()) {
             Transaction tx = s.beginTransaction();

@@ -1,8 +1,7 @@
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
-public class HibernateUtil {
-
+public class HibernateUser {
     static {
         System.setProperty("org.jboss.logging.provider", "slf4j");
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "off");
@@ -17,7 +16,7 @@ public class HibernateUtil {
         try {
             return new Configuration()
                     .configure()               // load the config file
-                    .addAnnotatedClass(Hotelnew.class)  // register entity, add more if needed
+                    .addAnnotatedClass(Users.class)  // register entity, add more if needed
                     .buildSessionFactory();
         } catch (Throwable ex) {
             System.err.println("SessionFactory couldnt be created.");
