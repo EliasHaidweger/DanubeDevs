@@ -1,7 +1,9 @@
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-
+/**
+ *
+ */
 public class UserShowcase {
     private static final SessionFactory sf = HibernateUtil.getSessionFactory();
 
@@ -13,6 +15,7 @@ public class UserShowcase {
 
         Users m = create("Max", 34);
         line(m.toString());
+
 
 /*
         line("GET BY ID");
@@ -36,7 +39,10 @@ public class UserShowcase {
        */
         sf.close();
     }
-
+    /**
+     * @Author  Marie Ilic
+     * v/n und daneben sagt man was es machen soll
+     */
     static Users create(String v, int  n ) {
         //Users p = Users.builder().name(v).age(n).role(e).build();
         Users p = Users.builder().name(v).age(n).build();
