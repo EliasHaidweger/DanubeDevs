@@ -1,13 +1,13 @@
+package trial;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.management.relation.Role;
-
 @Entity
-@Table(name = "User")
+@Table(name = "trial.Users")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

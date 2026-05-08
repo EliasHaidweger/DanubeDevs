@@ -1,19 +1,24 @@
+package trial;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
-import java.util.List;
-
-public class PersonCrudShowcase {
-
-
-    private static final SessionFactory sf = HibernateUtil.getSessionFactory();
+/**
+ *
+ */
+public class UserShowcase {
+    private static final SessionFactory sf = HibernateUser.getSessionFactory();
 
     public static void main(String[] args) {
 
         line("CREATE");
-        Hotelnew p = create("Besthotel", "Deutsch", "123456", "Wien");
-        line(p.toString());
+        //trial.Users p = create("Martin", 45, trial.Benutzerrolle.SENIOR);
+        //line(p.toString());
+
+        Users m = create("Max", 34);
+        line(m.toString());
+
 
 /*
         line("GET BY ID");
@@ -37,10 +42,13 @@ public class PersonCrudShowcase {
        */
         sf.close();
     }
-
-    static Hotelnew create(String v, String n, String e, String a) {
-        Hotelnew p = Hotelnew.builder().name(v).owner(n).phone(e).city(a).build();
-
+    /**
+     * @Author  Marie Ilic
+     * v/n und daneben sagt man was es machen soll
+     */
+    static Users create(String v, int  n ) {
+        //trial.Users p = trial.Users.builder().name(v).age(n).role(e).build();
+        Users p = Users.builder().name(v).age(n).build();
         try (Session s = sf.openSession()) {
             Transaction tx = s.beginTransaction();
 

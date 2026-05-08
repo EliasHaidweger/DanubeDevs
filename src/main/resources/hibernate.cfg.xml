@@ -27,7 +27,7 @@
 
         <!-- Entity Mapping -->
         <!--<mapping class="Hotelnew"/>-->
-        <mapping class="Users"/>
+        <mapping class="trial.Users"/>
 
 
     </session-factory>
