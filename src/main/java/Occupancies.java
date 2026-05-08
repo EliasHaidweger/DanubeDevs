@@ -1,7 +1,11 @@
 import lombok.AllArgsConstructor;
+import lombok.Data;
 
 @AllArgsConstructor
+@Data
+
 public class Occupancies {
+
     int id;
     int rooms;
     int usedRooms;
@@ -9,6 +13,4 @@ public class Occupancies {
     int usedBeds;
     int year;
     int month;
-
-
 }

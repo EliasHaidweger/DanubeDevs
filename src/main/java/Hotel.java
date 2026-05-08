@@ -3,6 +3,7 @@ import lombok.Data;
 
 @AllArgsConstructor
 @Data
+
 public class Hotel {
 
     int id;
