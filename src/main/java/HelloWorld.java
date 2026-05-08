@@ -26,5 +26,7 @@ public class HelloWorld {
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
+
+        new TransactionalDataView().setVisible(true);
     }
 }
