@@ -1,6 +1,4 @@
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Scanner;
+package old.UserStory;
 
 /*
  * Starts the main window for editing transactional occupancy data (rooms, beds, month/year).

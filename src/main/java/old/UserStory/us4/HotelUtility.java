@@ -1,4 +1,4 @@
-package UserStory;
+package old.UserStory.us4;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,7 +11,7 @@ import java.util.Scanner;
 public class HotelUtility {
 
     /**
-     * Reads hotels.txt from the resources folder and parses each line into a Hotel object.
+     * Reads hotels.txt from the resources folder and parses each line into a old.UserStory.Hotel object.
      * @return list of all hotels
      * @throws FileNotFoundException if hotels.txt is missing
      */

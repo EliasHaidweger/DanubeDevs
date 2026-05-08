@@ -1,3 +1,5 @@
+package old.UserStory;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -12,14 +14,14 @@ import java.io.IOException;
  *   AC-17-2: Written copyright clearance is saved before the logo is added
  *   AC-17-3: The logo is not distorted (scaled proportionally)
  * Structure layout documentation:
- *   LogoComponent (JLabel subclass) -> loadImage (ImageIO) -> scaleImage (getScaledInstance) -> setIcon (ImageIcon)
+ *   old.UserStory.LogoComponent (JLabel subclass) -> loadImage (ImageIO) -> scaleImage (getScaledInstance) -> setIcon (ImageIcon)
  */
 
 
 public class LogoComponent extends JLabel {
 
     //TO DO: kopiere das hier hinein in dein Window
-    //mainPanel.add(new LogoComponent(),  BorderLayout.NORTH);
+    //mainPanel.add(new old.UserStory.LogoComponent(),  BorderLayout.NORTH);
 
     public LogoComponent() {
         BufferedImage img = null; //BufferedImage ist das Logo, welches noch skaliert werden muss

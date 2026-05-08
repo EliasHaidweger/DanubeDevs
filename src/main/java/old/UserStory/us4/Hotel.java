@@ -1,9 +1,9 @@
-package UserStory;
+package old.UserStory.us4;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
- * Data model representing a Hotel entity.
+ * Data model representing a old.UserStory.Hotel entity.
  * Uses Lombok to generate getters, setters, toString and constructors.
  */
 @Data

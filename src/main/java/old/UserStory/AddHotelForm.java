@@ -1,10 +1,15 @@
+package old.UserStory;
+
+import old.UserStory.us4.Hotel;
+import old.UserStory.us4.HotelUtility;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
 public class AddHotelForm extends JFrame {
 
-    //Eingabefelder für die Hotel Stammdaten
+    //Eingabefelder für die old.UserStory.Hotel Stammdaten
     JTextField categoryField = new JTextField();
     JTextField nameField = new JTextField();
     JTextField ownerField = new JTextField();
@@ -17,11 +22,11 @@ public class AddHotelForm extends JFrame {
     JTextField bedsField = new JTextField();
 
     //Button zum speichern
-    JButton saveButton = new JButton("Save Hotel");
+    JButton saveButton = new JButton("Save old.UserStory.Hotel");
 
     public AddHotelForm() {
         //Frame Einstellungen
-        setTitle("Add New Hotel");
+        setTitle("Add New old.UserStory.Hotel");
         setSize(500, 750);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -36,10 +41,10 @@ public class AddHotelForm extends JFrame {
         mainPanel.setLayout(new GridLayout(12, 2,10, 10));
 
         //Gestaltung
-        mainPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(10,10,10,10), BorderFactory.createTitledBorder("Hotel Details")));
+        mainPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(10,10,10,10), BorderFactory.createTitledBorder("old.UserStory.Hotel Details")));
 
         //Label zeigt an, dass ID automatisch und nicht editierbar
-        mainPanel.add(new JLabel("Hotel ID"));
+        mainPanel.add(new JLabel("old.UserStory.Hotel ID"));
         mainPanel.add(new JLabel("Auto Generated"));
 
         //Stammdatenfelden hinzufügen
@@ -121,7 +126,7 @@ public class AddHotelForm extends JFrame {
             //Generierung einer neuen ID über die Hilfsklasse
             int newId = HotelUtility.generateNewHotelId();
 
-            //neues Hotel Objekt
+            //neues old.UserStory.Hotel Objekt
             Hotel newHotel = new Hotel(
                     newId,
                     categoryField.getText(),
@@ -138,7 +143,7 @@ public class AddHotelForm extends JFrame {
             //Speichern über Utility Klasse
             HotelUtility.saveHotel(newHotel);
             //Bestätigung
-            JOptionPane.showMessageDialog(this, "Hotel has been saved successfully " + newId);
+            JOptionPane.showMessageDialog(this, "old.UserStory.Hotel has been saved successfully " + newId);
             //Schließen und neues Fenster zum hinzufügen
             dispose();
             new AddHotelForm();

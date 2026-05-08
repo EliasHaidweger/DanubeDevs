@@ -1,22 +1,18 @@
-import javax.imageio.ImageIO;
+package old.UserStory;
+
 import javax.swing.*;
-import javax.swing.event.CaretListener;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 
 
 /*
  * View window for adding new transactional occupancy data (rooms, beds, month/year) per hotel.
  * US06
- *   AC-06-1: Hotel ID and name are pre-filled and locked (not editable).
+ *   AC-06-1: old.UserStory.Hotel ID and name are pre-filled and locked (not editable).
  *   AC-06-2: Room occupancy, bed occupancy, and month fields are editable.
  *   AC-06-3: Entering a month that already has data for the same hotel shows a warning.
  * Structure layout documentation:
- *   GUI (constructor + setupUI) -> setupListeners -> validateInputs -> handleSave -> OccupancyUtility Input(=read)/Output(=write)
+ *   GUI (constructor + setupUI) -> setupListeners -> validateInputs -> handleSave -> old.UserStory.OccupancyUtility Input(=read)/Output(=write)
  */
 
 public class EditTransactionalData extends JFrame {
@@ -124,9 +120,9 @@ public class EditTransactionalData extends JFrame {
     private void handleSave() {
         //saves occupancy to Database
         try {
-            ArrayList<Occupancies> occupancies = OccupancyUtility.loadOccupanciesFromFile();//Alle vorhandenen Occupancies aus Datei laden
+            ArrayList<Occupancies> occupancies = OccupancyUtility.loadOccupanciesFromFile();//Alle vorhandenen old.UserStory.Occupancies aus Datei laden
 
-            for (Occupancies occupancy : occupancies) { //Nach bereits existierendem Eintrag suchen (gleicher Hotel-Jahr-Monat)
+            for (Occupancies occupancy : occupancies) { //Nach bereits existierendem Eintrag suchen (gleicher old.UserStory.Hotel-Jahr-Monat)
                 if (occupancy.id == Integer.parseInt(idField.getText())) {// da ist ein = = sieht nur aus wie ==
                     if (occupancy.year == Integer.parseInt(yearField.getText())) {
                         if (occupancy.month == Integer.parseInt(monthField.getText())) {
@@ -136,7 +132,7 @@ public class EditTransactionalData extends JFrame {
                     }
                 }
             }
-            //Kein doppelter Eintrag → neues Occupancies-Objekt erstellen
+            //Kein doppelter Eintrag → neues old.UserStory.Occupancies-Objekt erstellen
             Occupancies o = new Occupancies(// beim übergeben wird noch umgewandelt
                     //id,rooms,usedrooms,beds,usedbeds,year,month
                     Integer.parseInt(idField.getText().trim()),//gib leerzeichen weg --> userfreundlich

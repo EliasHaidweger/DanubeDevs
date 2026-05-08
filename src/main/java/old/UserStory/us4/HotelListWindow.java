@@ -1,4 +1,4 @@
-package UserStory;
+package old.UserStory.us4;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -9,7 +9,7 @@ import java.util.Map;
 
 
 /**
- * Hotel list view for senior users of NOE-TO.
+ * old.UserStory.Hotel list view for senior users of NOE-TO.
  * Shows all hotels with the required fields:
  * ID, name, address, number of rooms, number of beds, last reported transactional data.
  */
@@ -29,7 +29,7 @@ public class HotelListWindow extends JFrame {
      * Sets the basic window properties.
      */
     private void defineFrame() {
-        setTitle("NOE-TO – Hotel List");
+        setTitle("NOE-TO – old.UserStory.Hotel List");
         setSize(950, 500);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -44,7 +44,7 @@ public class HotelListWindow extends JFrame {
         table.setModel(model);
 
         model.addColumn("ID");
-        model.addColumn("Hotel Name");
+        model.addColumn("old.UserStory.Hotel Name");
         model.addColumn("Address");
         model.addColumn("Rooms");
         model.addColumn("Beds");

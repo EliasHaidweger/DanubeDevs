@@ -1,3 +1,5 @@
+package old.UserStory;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -9,7 +11,7 @@ import java.util.Scanner;
 /*
  * View window that displays transactional data (occupancy records) per hotel with a month/year range filter.
  * US10
- *   AC-10-1: Hotel dropdown to select a specific hotel
+ *   AC-10-1: old.UserStory.Hotel dropdown to select a specific hotel
  *   AC-10-2: FROM and TO month/year filters to limit the results shown
  *   AC-10-3: All shown records match the data for the selected hotel and date range
  * Structure layout documentation:
@@ -44,7 +46,7 @@ public class TransactionalDataView extends JFrame {
     }
 
     private void defineFrame() {
-        setTitle("Transactional Data - Occupancy per Hotel");
+        setTitle("Transactional Data - Occupancy per old.UserStory.Hotel");
         setSize(950, 550);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -85,8 +87,8 @@ public class TransactionalDataView extends JFrame {
             }
         };
 
-        model.addColumn("Hotel ID");
-        model.addColumn("Hotel Name");
+        model.addColumn("old.UserStory.Hotel ID");
+        model.addColumn("old.UserStory.Hotel Name");
         model.addColumn("Year");
         model.addColumn("Month");
         model.addColumn("Rooms");
@@ -105,7 +107,7 @@ public class TransactionalDataView extends JFrame {
 
         JPanel filterPanel = new JPanel(new GridLayout(2, 7, 5, 5));
 
-        filterPanel.add(new JLabel("Hotel:"));
+        filterPanel.add(new JLabel("old.UserStory.Hotel:"));
         filterPanel.add(new JLabel("From Month:"));
         filterPanel.add(new JLabel("From Year:"));
         filterPanel.add(new JLabel(""));
@@ -192,7 +194,7 @@ public class TransactionalDataView extends JFrame {
     /*
      * Reads hotels from hotels.txt and fills the hotels list.
      * Skips the first line (header) and removes quotes from each field.
-     * Same Scanner approach as HelloWorld.java.
+     * Same Scanner approach as old.UserStory.HelloWorld.java.
      */
     private void loadHotels() {
         hotels = new ArrayList<>();
@@ -228,7 +230,7 @@ public class TransactionalDataView extends JFrame {
                     h.address  = parts[5].trim();
                     h.city     = parts[6].trim();
                     h.cityCode = parts[7].trim();
-                    // parts[8] = phone (not in Hotel class)
+                    // parts[8] = phone (not in old.UserStory.Hotel class)
                     h.noRooms  = Integer.parseInt(parts[9].trim());
                     h.noBeds   = Integer.parseInt(parts[10].trim());
                     hotels.add(h);

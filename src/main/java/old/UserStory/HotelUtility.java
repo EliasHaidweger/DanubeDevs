@@ -1,3 +1,5 @@
+package old.UserStory;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -26,7 +28,7 @@ public class HotelUtility {
             //Zeilen einlesen und beim Komma splitten
             String[] parts = sc.nextLine().split(",");
 
-            //neues Hotel Objekt und Anführungszeichen entfernen
+            //neues old.UserStory.Hotel Objekt und Anführungszeichen entfernen
             Hotel h = new Hotel(
                     Integer.parseInt(parts[0].replace("\"", "")),
                     parts[1].replace("\"", ""),
@@ -45,7 +47,7 @@ public class HotelUtility {
         sc.close();
         return hotels;
     }
-    //Erzeugt neue eindeutige Hotel ID
+    //Erzeugt neue eindeutige old.UserStory.Hotel ID
     public static int generateNewHotelId() throws FileNotFoundException {
         ArrayList<Hotel> hotels = loadHotelsFromFile();
 
