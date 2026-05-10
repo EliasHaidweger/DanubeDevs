@@ -1,13 +1,12 @@
-package old.UserStory.us4;
-import lombok.AllArgsConstructor;
+package model;
+
 import lombok.Data;
 
 /**
- * Data model representing a old.UserStory.Hotel entity.
- * Uses Lombok to generate getters, setters, toString and constructors.
+ * Repraesentiert eine Zeile aus dbo.hotels.
+ * Lombok @Data generiert automatisch Getter, Setter, equals, hashCode.
  */
 @Data
-@AllArgsConstructor
 public class Hotel {
 
     private int id;
@@ -21,5 +20,10 @@ public class Hotel {
     private String phone;
     private int noRooms;
     private int noBeds;
+    private String tags;
 
+    @Override
+    public String toString() {
+        return id + " - " + name;
+    }
 }
