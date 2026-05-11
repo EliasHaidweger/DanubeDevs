@@ -85,7 +85,7 @@ public class HotelDialog extends JDialog {
         JButton btnCancel = new JButton("Cancel");
         btnSave.addActionListener(e -> onSave());
         btnCancel.addActionListener(e -> dispose());
-        // Save zuerst (links), Cancel daneben (rechts)
+
         p.add(btnSave);
         p.add(btnCancel);
         return p;
