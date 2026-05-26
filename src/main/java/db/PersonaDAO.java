@@ -46,45 +46,17 @@ public class PersonaDAO {
         return list;
     }
 
-    /**
-     * Liefert die naechste freie Persona-ID (max + 1).
-     * Wenn die Tabelle leer ist -> 1.
-     * Vermeidet die IDENTITY-Spruenge (1001, 2001 etc.) die der
-     * SQL Server nach einem Neustart macht.
-     */
-    public int getNextId() {
-        String sql = "SELECT ISNULL(MAX(id), 0) + 1 FROM persona";
-
-        try (Connection c = DatabaseConnection.getConnection();
-             Statement s = c.createStatement();
-             ResultSet rs = s.executeQuery(sql)) {
-
-            if (rs.next()) return rs.getInt(1);
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 1;
-    }
-
-    /**
-     * Persona hinzufuegen (Story #12).
-     * ID wird manuell vergeben (max + 1) - kein IDENTITY noetig.
-     */
+    /** Persona hinzufuegen. */
     public boolean insertPersona(Persona p) {
-        int newId = getNextId();
-        p.setId(newId);
-
-        String sql = "INSERT INTO persona (id, username, password, role, can_delete) VALUES (?,?,?,?,?)";
+        String sql = "INSERT INTO persona (username, password, role, can_delete) VALUES (?,?,?,?)";
 
         try (Connection c = DatabaseConnection.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
 
-            ps.setInt(1, p.getId());
-            ps.setString(2, p.getUsername());
-            ps.setString(3, p.getPassword());
-            ps.setString(4, p.getRole());
-            ps.setBoolean(5, p.isCanDelete());
+            ps.setString(1, p.getUsername());
+            ps.setString(2, p.getPassword());
+            ps.setString(3, p.getRole());
+            ps.setBoolean(4, p.isCanDelete());
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
