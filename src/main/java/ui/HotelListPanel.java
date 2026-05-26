@@ -107,6 +107,16 @@ public class HotelListPanel extends JPanel {
     }
 
     private void onDelete() {
+        // Story #13: Zusaetzliche Sicherheitspruefung
+        // (zusaetzlich zum disabled Button - falls die Permission inzwischen entzogen wurde)
+        if (Session.getCurrentPersona() == null || !Session.getCurrentPersona().isCanDelete()) {
+            JOptionPane.showMessageDialog(this,
+                    "You do not have permission to delete hotels.",
+                    "Permission denied",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         int row = table.getSelectedRow();
         if (row < 0) {
             JOptionPane.showMessageDialog(this, "Please select a hotel first.");

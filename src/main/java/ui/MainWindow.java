@@ -61,7 +61,7 @@ public class MainWindow extends JFrame {
             tabs.addTab("Enter Occupancy",    new OccupancyPanel());
             tabs.addTab("Statistics",         new StatisticsPanel());
             tabs.addTab("Persona Management", new PersonaManagementPanel());
-
+            tabs.addTab("Import",             new ImportPanel());
             tabs.addTab("Help",               new HelpPanel());
 
         } else if (Persona.ROLE_HEAD.equals(role)) {
