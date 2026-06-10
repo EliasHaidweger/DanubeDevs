@@ -58,11 +58,10 @@ public class MainWindow extends JFrame {
         if (Persona.ROLE_SENIOR.equals(role)) {
             tabs.addTab("Dashboard",          new DashboardPanel());
             tabs.addTab("Hotels",             new HotelListPanel());
-            tabs.addTab("Hibrenate",          new HibernateDemoPanel());
             tabs.addTab("Enter Occupancy",    new OccupancyPanel());
             tabs.addTab("Statistics",         new StatisticsPanel());
             tabs.addTab("Persona Management", new PersonaManagementPanel());
-
+            tabs.addTab("Import",             new ImportPanel());
             tabs.addTab("Help",               new HelpPanel());
 
         } else if (Persona.ROLE_HEAD.equals(role)) {

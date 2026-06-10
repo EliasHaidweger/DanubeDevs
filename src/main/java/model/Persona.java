@@ -1,10 +1,15 @@
 package model;
 
+import jakarta.persistence.*;
 import lombok.Data;
 
 /**
- * Repraesentiert eine Persona aus dbo.persona.
+ * Hibernate-Entity fuer die persona-Tabelle.
+ *
+ * can_delete (BIT in der DB) wird auf boolean canDelete gemappt.
  */
+@Entity
+@Table(name = "persona")
 @Data
 public class Persona {
 
@@ -12,10 +17,20 @@ public class Persona {
     public static final String ROLE_HEAD   = "HEAD";
     public static final String ROLE_HOTEL  = "HOTEL";
 
+    @Id
+    @Column(name = "id")
     private int id;
+
+    @Column(name = "username")
     private String username;
+
+    @Column(name = "password")
     private String password;
+
+    @Column(name = "role")
     private String role;
+
+    @Column(name = "can_delete")
     private boolean canDelete;
 
     public String getRoleLabel() {

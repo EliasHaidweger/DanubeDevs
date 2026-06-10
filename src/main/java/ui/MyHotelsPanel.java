@@ -29,16 +29,21 @@ public class MyHotelsPanel extends JPanel {
         add(buildTable(),   BorderLayout.CENTER);
 
         loadData();
+
+        // Auto-Refresh: jedes Mal wenn dieser Tab sichtbar wird neu laden
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentShown(java.awt.event.ComponentEvent e) {
+                loadData();
+            }
+        });
     }
 
     private JPanel buildToolbar() {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JButton btnEdit    = new JButton("Edit");
-        JButton btnRefresh = new JButton("Refresh");
+        JButton btnEdit = new JButton("Edit");
         btnEdit.addActionListener(e -> onEdit());
-        btnRefresh.addActionListener(e -> loadData());
         p.add(btnEdit);
-        p.add(btnRefresh);
         return p;
     }
 

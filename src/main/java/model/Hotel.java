@@ -3,10 +3,20 @@ package model;
 import jakarta.persistence.*;
 import lombok.Data;
 
-
-@Data
+/**
+ * Hibernate-Entity fuer die hotels-Tabelle.
+ *
+ * @Entity      = das ist eine Hibernate-Entitaet
+ * @Table       = welche DB-Tabelle dahinter steht
+ * @Id          = Primaerschluessel
+ * @Column      = Spaltenname falls anders als Feldname
+ *
+ * Die ID wird NICHT von der DB generiert (kein @GeneratedValue),
+ * sondern manuell vergeben (max+1) - so vermeiden wir IDENTITY-Spruenge.
+ */
 @Entity
 @Table(name = "hotels")
+@Data
 public class Hotel {
 
     @Id
@@ -51,34 +61,3 @@ public class Hotel {
         return id + " - " + name;
     }
 }
-
-
-/*
-package model;
-
-
-import lombok.Data;
-
-
-@Data
-public class Hotel {
-
-    private int id;
-    private String category;
-    private String name;
-    private String owner;
-    private String contact;
-    private String address;
-    private String city;
-    private String cityCode;
-    private String phone;
-    private int noRooms;
-    private int noBeds;
-    private String tags;
-
-    @Override
-    public String toString() {
-        return id + " - " + name;
-    }
-}
-*/

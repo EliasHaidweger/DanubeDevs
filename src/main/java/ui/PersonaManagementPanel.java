@@ -29,6 +29,14 @@ public class PersonaManagementPanel extends JPanel {
         add(buildTable(),   BorderLayout.CENTER);
 
         loadData();
+
+        // Auto-Refresh: jedes Mal wenn dieser Tab sichtbar wird neu laden
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentShown(java.awt.event.ComponentEvent e) {
+                loadData();
+            }
+        });
     }
 
     private JPanel buildToolbar() {
@@ -37,17 +45,14 @@ public class PersonaManagementPanel extends JPanel {
         JButton btnAdd     = new JButton("+ Add Persona");
         JButton btnEdit    = new JButton("Edit");
         JButton btnDelete  = new JButton("Delete");
-        JButton btnRefresh = new JButton("Refresh");
 
         btnAdd.addActionListener(e -> onAdd());
         btnEdit.addActionListener(e -> onEdit());
         btnDelete.addActionListener(e -> onDelete());
-        btnRefresh.addActionListener(e -> loadData());
 
         p.add(btnAdd);
         p.add(btnEdit);
         p.add(btnDelete);
-        p.add(btnRefresh);
         return p;
     }
 

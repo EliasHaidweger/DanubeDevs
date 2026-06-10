@@ -41,12 +41,10 @@ public class HotelListPanel extends JPanel {
         JButton btnAdd     = new JButton("+ Add Hotel");
         JButton btnEdit    = new JButton("Edit");
         btnDelete          = new JButton("Delete");
-        JButton btnRefresh = new JButton("Refresh");
 
         btnAdd.addActionListener(e -> onAdd());
         btnEdit.addActionListener(e -> onEdit());
         btnDelete.addActionListener(e -> onDelete());
-        btnRefresh.addActionListener(e -> loadData());
 
         // Story #13
         if (Session.getCurrentPersona() == null || !Session.getCurrentPersona().isCanDelete()) {
@@ -57,7 +55,6 @@ public class HotelListPanel extends JPanel {
         p.add(btnAdd);
         p.add(btnEdit);
         p.add(btnDelete);
-        p.add(btnRefresh);
         return p;
     }
 
@@ -107,6 +104,16 @@ public class HotelListPanel extends JPanel {
     }
 
     private void onDelete() {
+        // Story #13: Zusaetzliche Sicherheitspruefung
+        // (zusaetzlich zum disabled Button - falls die Permission inzwischen entzogen wurde)
+        if (Session.getCurrentPersona() == null || !Session.getCurrentPersona().isCanDelete()) {
+            JOptionPane.showMessageDialog(this,
+                    "You do not have permission to delete hotels.",
+                    "Permission denied",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         int row = table.getSelectedRow();
         if (row < 0) {
             JOptionPane.showMessageDialog(this, "Please select a hotel first.");

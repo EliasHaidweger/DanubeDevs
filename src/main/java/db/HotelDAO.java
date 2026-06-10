@@ -1,100 +1,76 @@
 package db;
 
 import model.Hotel;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
-import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Alle SQL-Queries fuer die hotels-Tabelle.
+ * Hotel-Datenzugriff ueber Hibernate.
+ *
+ * Statt SQL-Strings nutzen wir jetzt:
+ *   - session.get()       zum Laden per ID
+ *   - session.createQuery (HQL) fuer Listen
+ *   - session.persist()   zum Einfuegen
+ *   - session.merge()     zum Aktualisieren
+ *   - session.remove()    zum Loeschen
+ *
+ * HQL (Hibernate Query Language) arbeitet mit Klassennamen statt Tabellennamen,
+ * z.B. "FROM Hotel" statt "SELECT * FROM hotels".
  */
 public class HotelDAO {
 
     /** Alle Hotels (Story #4). */
     public List<Hotel> getAllHotels() {
-        List<Hotel> list = new ArrayList<>();
-        String sql = "SELECT * FROM hotels ORDER BY id";
-
-        try (Connection c = DatabaseConnection.getConnection();
-             Statement s = c.createStatement();
-             ResultSet rs = s.executeQuery(sql)) {
-
-            while (rs.next()) list.add(map(rs));
-
-        } catch (SQLException e) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery("FROM Hotel ORDER BY id", Hotel.class).list();
+        } catch (Exception e) {
             e.printStackTrace();
+            return List.of();
         }
-        return list;
     }
 
     /** Ein Hotel anhand der ID. */
     public Hotel getHotelById(int id) {
-        String sql = "SELECT * FROM hotels WHERE id = ?";
-
-        try (Connection c = DatabaseConnection.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
-
-            ps.setInt(1, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return map(rs);
-            }
-        } catch (SQLException e) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.get(Hotel.class, id);
+        } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     /**
-     * Liefert die naechste freie ID (hoechste vorhandene ID + 1).
+     * Liefert die naechste freie ID (max + 1).
      * Wenn die Tabelle leer ist -> 1.
      */
     public int getNextId() {
-        String sql = "SELECT ISNULL(MAX(id), 0) + 1 FROM hotels";
-
-        try (Connection c = DatabaseConnection.getConnection();
-             Statement s = c.createStatement();
-             ResultSet rs = s.executeQuery(sql)) {
-
-            if (rs.next()) return rs.getInt(1);
-
-        } catch (SQLException e) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Integer maxId = session.createQuery("SELECT MAX(h.id) FROM Hotel h", Integer.class)
+                                   .uniqueResult();
+            return (maxId == null) ? 1 : maxId + 1;
+        } catch (Exception e) {
             e.printStackTrace();
+            return 1;
         }
-        return 1;
     }
 
     /**
      * Neues Hotel anlegen (Story #3).
-     * ID wird selbst berechnet (max + 1) - kein IDENTITY noetig.
+     * ID wird selbst berechnet (max + 1).
      */
     public boolean insertHotel(Hotel h) {
-        // ID automatisch holen
-        int newId = getNextId();
-        h.setId(newId);
+        h.setId(getNextId());
 
-        String sql = "INSERT INTO hotels (id, category, name, owner, contact, address, city, cityCode, phone, noRooms, noBeds, tags) "
-                   + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
-
-        try (Connection c = DatabaseConnection.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
-
-            ps.setInt(1, h.getId());
-            ps.setString(2,  h.getCategory());
-            ps.setString(3,  h.getName());
-            ps.setString(4,  h.getOwner());
-            ps.setString(5,  h.getContact());
-            ps.setString(6,  h.getAddress());
-            ps.setString(7,  h.getCity());
-            ps.setString(8,  h.getCityCode());
-            ps.setString(9,  h.getPhone());
-            ps.setInt(10,    h.getNoRooms());
-            ps.setInt(11,    h.getNoBeds());
-            ps.setString(12, h.getTags());
-
-            return ps.executeUpdate() > 0;
-
-        } catch (SQLException e) {
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
+            session.persist(h);
+            tx.commit();
+            return true;
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
             e.printStackTrace();
             return false;
         }
@@ -102,76 +78,45 @@ public class HotelDAO {
 
     /** Hotel aktualisieren (Story #5). */
     public boolean updateHotel(Hotel h) {
-        String sql = "UPDATE hotels SET category=?, name=?, owner=?, contact=?, address=?, city=?, cityCode=?, phone=?, noRooms=?, noBeds=?, tags=? "
-                   + "WHERE id=?";
-
-        try (Connection c = DatabaseConnection.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
-
-            ps.setString(1,  h.getCategory());
-            ps.setString(2,  h.getName());
-            ps.setString(3,  h.getOwner());
-            ps.setString(4,  h.getContact());
-            ps.setString(5,  h.getAddress());
-            ps.setString(6,  h.getCity());
-            ps.setString(7,  h.getCityCode());
-            ps.setString(8,  h.getPhone());
-            ps.setInt(9,     h.getNoRooms());
-            ps.setInt(10,    h.getNoBeds());
-            ps.setString(11, h.getTags());
-            ps.setInt(12,    h.getId());
-
-            return ps.executeUpdate() > 0;
-
-        } catch (SQLException e) {
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
+            session.merge(h);
+            tx.commit();
+            return true;
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
             e.printStackTrace();
             return false;
         }
     }
 
-    /** Hotel + alle Belegungen loeschen (Story #11). */
+    /** Hotel + alle abhaengigen Daten loeschen (Story #11). */
     public boolean deleteHotel(int id) {
-        try (Connection c = DatabaseConnection.getConnection()) {
-            c.setAutoCommit(false);
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
 
-            try (PreparedStatement p1 = c.prepareStatement("DELETE FROM occupancies WHERE hotel_id = ?");
-                 PreparedStatement p2 = c.prepareStatement("DELETE FROM bookings WHERE hotel_id = ?");
-                 PreparedStatement p3 = c.prepareStatement("DELETE FROM persona_hotels WHERE hotel_id = ?");
-                 PreparedStatement p4 = c.prepareStatement("DELETE FROM hotels WHERE id = ?")) {
+            // Erst abhaengige Daten loeschen (occupancies, bookings, persona_hotels)
+            session.createMutationQuery("DELETE FROM Occupancy o WHERE o.hotelId = :id")
+                   .setParameter("id", id).executeUpdate();
+            session.createMutationQuery("DELETE FROM PersonaHotel ph WHERE ph.hotelId = :id")
+                   .setParameter("id", id).executeUpdate();
 
-                p1.setInt(1, id); p1.executeUpdate();
-                p2.setInt(1, id); p2.executeUpdate();
-                p3.setInt(1, id); p3.executeUpdate();
-                p4.setInt(1, id); p4.executeUpdate();
+            // bookings hat keine Entity -> per native SQL
+            session.createNativeMutationQuery("DELETE FROM bookings WHERE hotel_id = :id")
+                   .setParameter("id", id).executeUpdate();
 
-                c.commit();
-                return true;
+            // Jetzt das Hotel selbst
+            Hotel h = session.get(Hotel.class, id);
+            if (h != null) session.remove(h);
 
-            } catch (SQLException ex) {
-                c.rollback();
-                ex.printStackTrace();
-                return false;
-            }
-        } catch (SQLException e) {
+            tx.commit();
+            return true;
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
             e.printStackTrace();
             return false;
         }
-    }
-
-    private Hotel map(ResultSet rs) throws SQLException {
-        Hotel h = new Hotel();
-        h.setId(rs.getInt("id"));
-        h.setCategory(rs.getString("category"));
-        h.setName(rs.getString("name"));
-        h.setOwner(rs.getString("owner"));
-        h.setContact(rs.getString("contact"));
-        h.setAddress(rs.getString("address"));
-        h.setCity(rs.getString("city"));
-        h.setCityCode(rs.getString("cityCode"));
-        h.setPhone(rs.getString("phone"));
-        h.setNoRooms(rs.getInt("noRooms"));
-        h.setNoBeds(rs.getInt("noBeds"));
-        h.setTags(rs.getString("tags"));
-        return h;
     }
 }

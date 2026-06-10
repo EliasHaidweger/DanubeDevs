@@ -7,10 +7,16 @@ import model.Occupancy;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.List;
 
 /**
  * Belegung eintragen (Story #6).
+ *
+ * Auto-Refresh: Das Hotel-Dropdown wird automatisch neu geladen, sobald
+ * der Tab angezeigt wird (ComponentListener) UND nach jedem Speichern.
+ * Kein Refresh-Button noetig.
  */
 public class OccupancyPanel extends JPanel {
 
@@ -30,20 +36,19 @@ public class OccupancyPanel extends JPanel {
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        add(buildToolbar(), BorderLayout.NORTH);
         add(buildForm(), BorderLayout.CENTER);
         add(buildButtons(), BorderLayout.SOUTH);
 
         loadHotels();
-    }
 
-    /** Toolbar oben mit Refresh-Button. */
-    private JPanel buildToolbar() {
-        JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JButton btnRefresh = new JButton("Refresh hotels");
-        btnRefresh.addActionListener(e -> loadHotels());
-        p.add(btnRefresh);
-        return p;
+        // Auto-Refresh: jedes Mal wenn dieser Tab sichtbar wird,
+        // werden die Hotels neu geladen (falls inzwischen welche dazukamen)
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent e) {
+                loadHotels();
+            }
+        });
     }
 
     private JPanel buildForm() {
@@ -84,11 +89,23 @@ public class OccupancyPanel extends JPanel {
         return p;
     }
 
-    /** Laed alle Hotels aus der DB ins Dropdown. */
+    /** Laedt alle Hotels aus der DB ins Dropdown. */
     private void loadHotels() {
+        Hotel previouslySelected = (Hotel) cbHotel.getSelectedItem();
+
         cbHotel.removeAllItems();
         List<Hotel> hotels = hotelDAO.getAllHotels();
         for (Hotel h : hotels) cbHotel.addItem(h);
+
+        // Vorherige Auswahl wiederherstellen (falls noch vorhanden)
+        if (previouslySelected != null) {
+            for (int i = 0; i < cbHotel.getItemCount(); i++) {
+                if (cbHotel.getItemAt(i).getId() == previouslySelected.getId()) {
+                    cbHotel.setSelectedIndex(i);
+                    break;
+                }
+            }
+        }
         updateHotelInfo();
     }
 
@@ -134,6 +151,8 @@ public class OccupancyPanel extends JPanel {
                 JOptionPane.showMessageDialog(this, "Occupancy saved!");
                 tfUsedRooms.setText("");
                 tfUsedBeds.setText("");
+                // Auto-Refresh nach Speichern
+                loadHotels();
             } else {
                 JOptionPane.showMessageDialog(this, "Save failed.");
             }

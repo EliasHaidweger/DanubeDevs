@@ -46,6 +46,15 @@ public class MySubmissionPanel extends JPanel {
 
         loadMyHotels();
         loadPast();
+
+        // Auto-Refresh: jedes Mal wenn dieser Tab sichtbar wird neu laden
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentShown(java.awt.event.ComponentEvent e) {
+                loadMyHotels();
+                loadPast();
+            }
+        });
     }
 
     private JPanel buildForm() {

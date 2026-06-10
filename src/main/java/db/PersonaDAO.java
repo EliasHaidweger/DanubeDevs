@@ -1,65 +1,67 @@
 package db;
 
 import model.Persona;
+import model.PersonaHotel;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
-import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * SQL-Queries fuer persona + persona_hotels.
+ * Persona-Datenzugriff ueber Hibernate.
  */
 public class PersonaDAO {
 
     /** Login pruefen. */
     public Persona login(String username, String password) {
-        String sql = "SELECT * FROM persona WHERE username = ? AND password = ?";
-
-        try (Connection c = DatabaseConnection.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
-
-            ps.setString(1, username);
-            ps.setString(2, password);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return map(rs);
-            }
-        } catch (SQLException e) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery(
+                    "FROM Persona p WHERE p.username = :u AND p.password = :pw",
+                    Persona.class)
+                    .setParameter("u", username)
+                    .setParameter("pw", password)
+                    .uniqueResult();
+        } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     /** Alle Personas (Story #12). */
     public List<Persona> getAllPersonas() {
-        List<Persona> list = new ArrayList<>();
-        String sql = "SELECT * FROM persona ORDER BY id";
-
-        try (Connection c = DatabaseConnection.getConnection();
-             Statement s = c.createStatement();
-             ResultSet rs = s.executeQuery(sql)) {
-
-            while (rs.next()) list.add(map(rs));
-
-        } catch (SQLException e) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery("FROM Persona ORDER BY id", Persona.class).list();
+        } catch (Exception e) {
             e.printStackTrace();
+            return List.of();
         }
-        return list;
     }
 
-    /** Persona hinzufuegen. */
+    /** Naechste freie ID (max + 1). */
+    public int getNextId() {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Integer maxId = session.createQuery("SELECT MAX(p.id) FROM Persona p", Integer.class)
+                                   .uniqueResult();
+            return (maxId == null) ? 1 : maxId + 1;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 1;
+        }
+    }
+
+    /** Persona hinzufuegen (Story #12). ID = max + 1. */
     public boolean insertPersona(Persona p) {
-        String sql = "INSERT INTO persona (username, password, role, can_delete) VALUES (?,?,?,?)";
+        p.setId(getNextId());
 
-        try (Connection c = DatabaseConnection.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
-
-            ps.setString(1, p.getUsername());
-            ps.setString(2, p.getPassword());
-            ps.setString(3, p.getRole());
-            ps.setBoolean(4, p.isCanDelete());
-
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
+            session.persist(p);
+            tx.commit();
+            return true;
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
             e.printStackTrace();
             return false;
         }
@@ -67,41 +69,37 @@ public class PersonaDAO {
 
     /** Persona aktualisieren (Story #13). */
     public boolean updatePersona(Persona p) {
-        String sql = "UPDATE persona SET password=?, role=?, can_delete=? WHERE id=?";
-
-        try (Connection c = DatabaseConnection.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
-
-            ps.setString(1, p.getPassword());
-            ps.setString(2, p.getRole());
-            ps.setBoolean(3, p.isCanDelete());
-            ps.setInt(4, p.getId());
-
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
+            session.merge(p);
+            tx.commit();
+            return true;
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
             e.printStackTrace();
             return false;
         }
     }
 
-    /** Persona loeschen. */
+    /** Persona loeschen (inkl. ihrer Hotel-Verknuepfungen). */
     public boolean deletePersona(int id) {
-        try (Connection c = DatabaseConnection.getConnection()) {
-            c.setAutoCommit(false);
-            try (PreparedStatement p1 = c.prepareStatement("DELETE FROM persona_hotels WHERE persona_id = ?");
-                 PreparedStatement p2 = c.prepareStatement("DELETE FROM persona WHERE id = ?")) {
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
 
-                p1.setInt(1, id); p1.executeUpdate();
-                p2.setInt(1, id); p2.executeUpdate();
-                c.commit();
-                return true;
+            // Erst die Verknuepfungen in persona_hotels
+            session.createMutationQuery("DELETE FROM PersonaHotel ph WHERE ph.personaId = :id")
+                   .setParameter("id", id).executeUpdate();
 
-            } catch (SQLException ex) {
-                c.rollback();
-                ex.printStackTrace();
-                return false;
-            }
-        } catch (SQLException e) {
+            // Dann die Persona selbst
+            Persona p = session.get(Persona.class, id);
+            if (p != null) session.remove(p);
+
+            tx.commit();
+            return true;
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
             e.printStackTrace();
             return false;
         }
@@ -109,29 +107,15 @@ public class PersonaDAO {
 
     /** Welche Hotel-IDs gehoeren einer Hotel-Rep-Persona? */
     public List<Integer> getHotelIdsForPersona(int personaId) {
-        List<Integer> list = new ArrayList<>();
-        String sql = "SELECT hotel_id FROM persona_hotels WHERE persona_id = ?";
-
-        try (Connection c = DatabaseConnection.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
-
-            ps.setInt(1, personaId);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) list.add(rs.getInt(1));
-            }
-        } catch (SQLException e) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery(
+                    "SELECT ph.hotelId FROM PersonaHotel ph WHERE ph.personaId = :id",
+                    Integer.class)
+                    .setParameter("id", personaId)
+                    .list();
+        } catch (Exception e) {
             e.printStackTrace();
+            return new ArrayList<>();
         }
-        return list;
-    }
-
-    private Persona map(ResultSet rs) throws SQLException {
-        Persona p = new Persona();
-        p.setId(rs.getInt("id"));
-        p.setUsername(rs.getString("username"));
-        p.setPassword(rs.getString("password"));
-        p.setRole(rs.getString("role"));
-        p.setCanDelete(rs.getBoolean("can_delete"));
-        return p;
     }
 }

@@ -59,6 +59,15 @@ public class StatisticsPanel extends JPanel {
 
         add(buildFilters(), BorderLayout.NORTH);
         add(buildTable(),   BorderLayout.CENTER);
+
+        // Auto-Refresh: jedes Mal wenn dieser Tab sichtbar wird,
+        // wird die Hotel-Liste neu geladen
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentShown(java.awt.event.ComponentEvent e) {
+                refreshHotels();
+            }
+        });
     }
 
     private JPanel buildFilters() {
@@ -106,14 +115,11 @@ public class StatisticsPanel extends JPanel {
         hotelFilterPanel.add(cbToYear);
         main.add(hotelFilterPanel);
 
-        // ====== Reihe 4: Show + Refresh ======
+        // ====== Reihe 4: Show ======
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JButton btnShow = new JButton("Show");
-        JButton btnRefresh = new JButton("Refresh hotels");
         btnShow.addActionListener(e -> loadData());
-        btnRefresh.addActionListener(e -> refreshHotels());
         buttonPanel.add(btnShow);
-        buttonPanel.add(btnRefresh);
         main.add(buttonPanel);
 
         // Default: nur "By month/year" anzeigen
@@ -143,9 +149,22 @@ public class StatisticsPanel extends JPanel {
         repaint();
     }
 
+    /** Laedt die Hotel-Liste neu (fuer Auto-Refresh). */
     private void refreshHotels() {
+        Hotel previouslySelected = (Hotel) cbHotel.getSelectedItem();
+
         cbHotel.removeAllItems();
         for (Hotel h : hotelDAO.getAllHotels()) cbHotel.addItem(h);
+
+        // Vorherige Auswahl wiederherstellen falls noch vorhanden
+        if (previouslySelected != null) {
+            for (int i = 0; i < cbHotel.getItemCount(); i++) {
+                if (cbHotel.getItemAt(i).getId() == previouslySelected.getId()) {
+                    cbHotel.setSelectedIndex(i);
+                    break;
+                }
+            }
+        }
     }
 
     private JScrollPane buildTable() {

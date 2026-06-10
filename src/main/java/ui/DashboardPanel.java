@@ -33,9 +33,16 @@ public class DashboardPanel extends JPanel {
 
         add(buildSummary(), BorderLayout.NORTH);
         add(buildTable(),   BorderLayout.CENTER);
-        add(buildRefresh(), BorderLayout.SOUTH);
 
         loadData();
+
+        // Auto-Refresh: jedes Mal wenn dieser Tab sichtbar wird neu laden
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentShown(java.awt.event.ComponentEvent e) {
+                loadData();
+            }
+        });
     }
 
     private JPanel buildSummary() {
@@ -68,14 +75,6 @@ public class DashboardPanel extends JPanel {
         JTable t = new JTable(model);
         t.setRowHeight(24);
         return new JScrollPane(t);
-    }
-
-    private JPanel buildRefresh() {
-        JPanel p = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton btn = new JButton("Refresh");
-        btn.addActionListener(e -> loadData());
-        p.add(btn);
-        return p;
     }
 
     public void loadData() {
