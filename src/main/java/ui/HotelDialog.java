@@ -109,6 +109,7 @@ public class HotelDialog extends JDialog {
     private void onSave() {
         if (tfName.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Hotel name is required.");
+            // statt refresh button soll bei der action selbst die liste refreshed werden
             return;
         }
 
