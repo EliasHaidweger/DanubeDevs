@@ -7,17 +7,17 @@ import org.hibernate.Transaction;
 import java.util.List;
 
 /**
- * Datenzugriff fuer Belegungen (Occupancies) ueber Hibernate.
+ * Data access for occupancy records via Hibernate.
  *
- * Zustaendig fuer die Persistenz folgender User Stories:
- *   US 2  - Belegung aller Hotels fuer einen Monat
- *   US 6  - Belegung erfassen
- *   US 10 - Belegungen eines Hotels in einem Zeitraum
- *   US 27 - Alle eigenen Belegungen eines Hotels
+ * Responsible for the following user stories:
+ *   US 2  - Monthly occupancy rates for all hotels
+ *   US 6  - Record occupancy
+ *   US 10 - Hotel occupancy rates for a specific period
+ *   US 27 - All of a hotel's own bookings
  */
 public class OccupancyDAO {
 
-    /** US 2: Belegungen aller Hotels fuer einen bestimmten Monat/Jahr. */
+    /** US 2: Room availability at all hotels for a specific month/year. */
     public List<Occupancy> findByMonth(int year, int month) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.createQuery(
@@ -29,7 +29,7 @@ public class OccupancyDAO {
         }
     }
 
-    /** US 27: Alle Belegungen eines Hotels (neueste zuerst). */
+    /** US 27: All hotel bookings (most recent first). */
     public List<Occupancy> findByHotel(int hotelId) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.createQuery(
@@ -40,14 +40,8 @@ public class OccupancyDAO {
         }
     }
 
-    /**
-     * US 10: Belegungen eines Hotels in einem Zeitraum (von/bis Monat+Jahr).
-     * Der Ausdruck (year * 12 + month) bildet jeden Monat auf eine
-     * fortlaufende Zahl ab und macht den Bereichsvergleich einfach.
-     */
-    public List<Occupancy> findByHotelInRange(int hotelId,
-                                              int fromYear, int fromMonth,
-                                              int toYear, int toMonth) {
+    /** US 10: Hotel occupancy rates for a specific period (from/to month+year). */
+    public List<Occupancy> findByHotelInRange(int hotelId, int fromYear, int fromMonth, int toYear, int toMonth) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.createQuery(
                     "FROM Occupancy o WHERE o.hotelId = :hotelId "
@@ -63,9 +57,8 @@ public class OccupancyDAO {
     }
 
     /**
-     * US 6: Speichert eine Belegung.
-     * merge() fuegt neu ein oder aktualisiert, falls fuer diesen
-     * Schluessel (Hotel + Jahr + Monat) bereits ein Eintrag existiert.
+     * US 6: Saves a reservation.
+     * merge() adds a new entry or updates the existing one if an entry already exists for this key (Hotel + Year + Month).
      */
     public void save(Occupancy occupancy) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {

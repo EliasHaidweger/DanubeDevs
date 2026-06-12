@@ -8,17 +8,17 @@ import org.hibernate.Transaction;
 import java.util.List;
 
 /**
- * Datenzugriff fuer Personas (Benutzerkonten) ueber Hibernate.
+ * Data access for personas (user accounts) via Hibernate.
  *
- * Zustaendig fuer:
- *   Login   - Authentifizierung
- *   US 12   - Personas verwalten (anlegen, auflisten, bearbeiten, loeschen)
- *   US 13   - Loeschberechtigung (Feld canDelete)
- *   US 24   - Hotelzuordnung einer Hotel-Persona
+ * Responsible for the following user stories:
+ *   Login   - Authentication
+ *   US 12   - Manage personas (create, list, edit, delete)
+ *   US 13   - Delete permission (canDelete field)
+ *   US 24   - Assigning a hotel-persona to a hotel
  */
 public class PersonaDAO {
 
-    /** Prueft Login-Daten und liefert die passende Persona (oder null). */
+    /** Checks login credentials and returns the corresponding persona (or null). */
     public Persona login(String username, String password) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.createQuery(
@@ -30,21 +30,21 @@ public class PersonaDAO {
         }
     }
 
-    /** US 12: Liefert alle Personas, sortiert nach ID. */
+    /** US 12: Returns all personas, sorted by ID. */
     public List<Persona> findAll() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.createQuery("FROM Persona ORDER BY id", Persona.class).list();
         }
     }
 
-    /** Liefert eine Persona anhand ihrer ID (oder null). */
+    /** Returns a persona using its ID (or null). */
     public Persona findById(int id) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.get(Persona.class, id);
         }
     }
 
-    /** US 12: Legt eine neue Persona an. Die ID wird fortlaufend vergeben (max + 1). */
+    /** US 12: Creates a new persona. The ID is assigned sequentially (incremented by 1). */
     public void save(Persona persona) {
         persona.setId(nextId());
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -54,7 +54,7 @@ public class PersonaDAO {
         }
     }
 
-    /** US 12/13: Aktualisiert eine bestehende Persona (z.B. Rolle oder Loeschrecht). */
+    /** US 12/13: Updates an existing persona (e.g., role or deletion permissions). */
     public void update(Persona persona) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             Transaction tx = session.beginTransaction();
@@ -63,7 +63,7 @@ public class PersonaDAO {
         }
     }
 
-    /** US 12: Loescht eine Persona samt ihrer Hotelzuordnungen. */
+    /** US 12: Deletes a persona along with its hotel assignments. */
     public void delete(int id) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             Transaction tx = session.beginTransaction();
@@ -78,7 +78,7 @@ public class PersonaDAO {
         }
     }
 
-    /** US 24: Liefert die Hotel-IDs, die einer Hotel-Persona zugeordnet sind. */
+    /** US 24: Returns the hotel IDs associated with a hotel persona. */
     public List<Integer> findHotelIds(int personaId) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.createQuery(
@@ -89,7 +89,7 @@ public class PersonaDAO {
         }
     }
 
-    /** Naechste freie ID (max + 1) - vermeidet Luecken und IDENTITY-Spruenge. */
+    /** Next available ID (max + 1). This prevents gaps and IDENTITY jumps. */
     private int nextId() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             Integer maxId = session.createQuery("SELECT MAX(p.id) FROM Persona p", Integer.class)

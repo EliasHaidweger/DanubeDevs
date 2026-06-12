@@ -8,14 +8,13 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
 /**
- * Stellt die zentrale Hibernate-SessionFactory bereit.
+ * Provides the central Hibernate SessionFactory.
  *
- * Die SessionFactory ist ein schwergewichtiges Objekt und wird daher
- * nur EINMAL erzeugt und im gesamten Programm wiederverwendet.
- * Aus ihr oeffnen die DAOs bei Bedarf kurzlebige Sessions.
+ * The SessionFactory is a heavyweight object and is therefore created only ONCE
+ * and reused throughout the entire program.
+ * The DAOs use it to open short-lived sessions as needed.
  *
- * Die Konfiguration (DB-Verbindung) steht in hibernate.cfg.xml,
- * die Entity-Klassen werden hier registriert.
+ * The configuration (DB connection) is specified in hibernate.cfg.xml; the entity classes are registered here.
  */
 public class HibernateUtil {
 
@@ -45,7 +44,7 @@ public class HibernateUtil {
         return SESSION_FACTORY;
     }
 
-    /** Schliesst die SessionFactory (beim Programm-Ende). */
+    /** Closes the SessionFactory (at the end of the program). */
     public static void shutdown() {
         SESSION_FACTORY.close();
     }
