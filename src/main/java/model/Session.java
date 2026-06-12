@@ -4,11 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Haelt den Anmeldezustand waehrend der Programmlaufzeit fest:
- * die aktuell angemeldete Persona und - bei einem Hotel-Benutzer -
- * die IDs seiner zugeordneten Hotels.
+ * Maintains the logged-in status for the duration of the program:
+ * the currently logged-in user and the IDs of the hotels associated for a hotel user.
  *
- * Bewusst KEINE Hibernate-Entity, sondern reiner Anwendungszustand.
+ * This is deliberately NOT a Hibernate entity, but purely an application state.
  */
 public class Session {
 

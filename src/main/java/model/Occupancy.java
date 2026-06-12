@@ -4,10 +4,10 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 /**
- * Hibernate-Entity fuer die occupancies-Tabelle.
+ * Hibernate entity for the occupancies table.
  *
- * Besonderheit: zusammengesetzter Primaerschluessel (hotel_id + year + month).
- * Deshalb @IdClass(OccupancyId.class) und 3 Felder mit @Id.
+ * Special feature: composite primary key (hotel_id + year + month).
+ * That's why @IdClass(OccupancyId.class) and 3 fields with @Id.
  */
 @Entity
 @Table(name = "occupancies")

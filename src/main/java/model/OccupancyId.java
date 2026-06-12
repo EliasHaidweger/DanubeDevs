@@ -5,12 +5,12 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * Zusammengesetzter Primaerschluessel fuer Occupancy.
- * Die occupancies-Tabelle hat PRIMARY KEY (hotel_id, year, month),
- * also brauchen wir eine eigene Klasse die diese 3 Felder buendelt.
+ * Composite primary key for Occupancy.
+ * The `occupancies` table has a PRIMARY KEY (hotel_id, year, month),
+ * So we need a separate class to group these three fields together.
  *
- * Muss Serializable sein und equals/hashCode haben (macht Lombok @Data).
- * Die Feldnamen muessen exakt zu den @Id-Feldern in Occupancy passen.
+ * Must be Serializable and have equals and hashCode methods (Lombok handles this with @Data).
+ * IMPORTANT: The field names must exactly match the @Id fields in Occupancy.
  */
 @Data
 public class OccupancyId implements Serializable {

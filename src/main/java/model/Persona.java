@@ -4,9 +4,9 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 /**
- * Hibernate-Entity fuer die persona-Tabelle.
+ * Hibernate entity for the persona table.
  *
- * can_delete (BIT in der DB) wird auf boolean canDelete gemappt.
+ * can_delete (a bit in the database) is mapped to the boolean variable canDelete.
  */
 @Entity
 @Table(name = "persona")

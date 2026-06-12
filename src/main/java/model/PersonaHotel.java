@@ -6,10 +6,10 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * Hibernate-Entity fuer die persona_hotels-Tabelle (n:m Verknuepfung).
- * Welche Persona darf welche Hotels sehen/bearbeiten.
+ * Hibernate entity for the persona_hotels table (n:m relationship).
+ * Which persona is allowed to view/edit which hotels?
  *
- * Zusammengesetzter Schluessel (persona_id + hotel_id).
+ * Composite key (persona_id + hotel_id).
  */
 @Entity
 @Table(name = "persona_hotels")
@@ -25,7 +25,7 @@ public class PersonaHotel {
     @Column(name = "hotel_id")
     private int hotelId;
 
-    /** Composite-Key-Klasse. */
+    /** Composite key class. */
     @Data
     public static class PersonaHotelId implements Serializable {
         private int personaId;
