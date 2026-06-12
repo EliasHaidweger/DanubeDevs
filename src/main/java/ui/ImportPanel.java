@@ -19,17 +19,17 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * CSV-Import fuer Belegungsdaten (US 16).
- * Nutzt Apache Commons CSV.
+ * CSV Import for Booking Data (US 16).
+ * Uses Apache Commons CSV.
  *
- * Erwartetes Format (Semikolon-getrennt, UTF-8, erste Zeile = Header):
+ * Expected format (semicolon-separated, UTF-8, first line = header):
  *   hotel_id;rooms;usedrooms;beds;usedbeds;year;month
  *
- * Validierungen je Zeile:
- *   - Hotel-ID muss in der DB existieren
- *   - alle Felder muessen gueltige Zahlen sein
+ * Validations per row:
+ *   - The hotel ID must exist in the database
+ *   - All fields must contain valid numbers
  *   - usedrooms <= rooms, usedbeds <= beds
- *   - Year zwischen 2000-2030, Month zwischen 1-12
+ *   - Year between 2000-2030, Month between 1-12
  */
 public class ImportPanel extends JPanel {
 

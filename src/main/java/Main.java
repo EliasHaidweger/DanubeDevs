@@ -4,11 +4,13 @@ import ui.MainWindow;
 import javax.swing.*;
 
 /**
- * Einstiegspunkt der Anwendung.
+ * Entry point of the application.
  *
- * Zeigt zuerst den Login-Dialog. Nach erfolgreichem Login oeffnet sich
- * das Hauptfenster mit den fuer die jeweilige Rolle passenden Tabs.
+ * First displays the login dialog. After a successful login, the following opens
+ * the main window with the tabs appropriate for each role.
+ *
  */
+
 public class Main {
 
     public static void main(String[] args) {
@@ -26,12 +28,12 @@ public class Main {
         });
     }
 
-    /** Verwendet das native Aussehen des Betriebssystems (statt des Java-Standards). */
+    /** Uses the operating system's native appearance (instead of the Java standard). */
     private static void applySystemLookAndFeel() {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
-            // Faellt auf das Standard-Look-and-Feel zurueck - unkritisch
+            // Falls back on the default look and feel - non-critical
         }
     }
 }

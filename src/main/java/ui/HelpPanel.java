@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Hilfe-Tab mit Bedienungsanleitung (US 18).
+ * Help tab with user manual (US 18).
  */
 public class HelpPanel extends JPanel {
 

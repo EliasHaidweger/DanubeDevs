@@ -7,8 +7,8 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Dialog zum Anlegen (US 3) und Bearbeiten (US 5) eines Hotels.
- * Die ID wird beim Speichern automatisch vergeben.
+ * Dialog box for creating (US 3) and editing (US 5) a hotel.
+ * The ID is automatically assigned when you save.
  */
 public class HotelDialog extends JDialog {
 

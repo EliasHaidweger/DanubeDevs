@@ -7,11 +7,11 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Hauptfenster der Anwendung.
+ * Main window of the application.
  *
- * Zeigt oben das Logo und den angemeldeten Benutzer mit Logout-Button,
- * darunter die Tabs. Welche Tabs sichtbar sind, haengt von der Rolle
- * des angemeldeten Benutzers ab (Senior User, Head of NOE-TO, Hotel Rep).
+ * Displays the logo and the logged-in user at the top, along with a logout button,
+ * including the tabs. Which tabs are visible depends on the role
+ * depends on the logged-in user (Senior User, Head of NOE-TO, Hotel Rep).
  */
 public class MainWindow extends JFrame {
 

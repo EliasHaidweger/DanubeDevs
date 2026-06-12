@@ -9,14 +9,14 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
 /**
- * Hotelverwaltung fuer den Senior User.
+ * Hotel Management for Senior Users.
  *
- * Deckt folgende User Stories ab:
- *   US 4  - Liste aller Hotels
- *   US 3  - Hotel anlegen (oeffnet HotelDialog)
- *   US 5  - Hotel bearbeiten (oeffnet HotelDialog)
- *   US 11 - Hotel loeschen (mit Bestaetigung)
- *   US 13 - Loeschen nur mit Berechtigung (canDelete)
+ * Covers the following user stories:
+ *   US 4  - List of all hotels
+ *   US 3  - Create Hotel (opens HotelDialog)
+ *   US 5  - Edit Hotel (opens the Hotel dialog)
+ *   US 11 - Cancel hotel reservation (with confirmation)
+ *   US 13 - Delete only if authorized (canDelete)
  */
 public class HotelListPanel extends JPanel {
 
@@ -66,7 +66,7 @@ public class HotelListPanel extends JPanel {
         return p;
     }
 
-    /** US 4: Laedt alle Hotels in die Tabelle. */
+    /** US 4: Load all hotels into the table. */
     private void loadData() {
         model.setRowCount(0);
         for (Hotel h : hotelDAO.findAll()) {
@@ -77,14 +77,14 @@ public class HotelListPanel extends JPanel {
         }
     }
 
-    /** US 3: Neues Hotel anlegen. */
+    /** US 3: Create a new hotel. */
     private void onAdd() {
         HotelDialog dialog = new HotelDialog(parentFrame(), null);
         dialog.setVisible(true);
         if (dialog.wasSaved()) loadData();
     }
 
-    /** US 5: Ausgewaehltes Hotel bearbeiten. */
+    /** US 5: Edit selected hotel. */
     private void onEdit() {
         Integer id = selectedHotelId();
         if (id == null) return;
@@ -100,7 +100,7 @@ public class HotelListPanel extends JPanel {
         if (dialog.wasSaved()) loadData();
     }
 
-    /** US 11 + US 13: Ausgewaehltes Hotel loeschen (mit Berechtigung und Bestaetigung). */
+    /** US 11 + US 13: Delete selected hotel (with authorization and confirmation). */
     private void onDelete() {
         if (!currentUserCanDelete()) {
             JOptionPane.showMessageDialog(this,
@@ -123,7 +123,7 @@ public class HotelListPanel extends JPanel {
         }
     }
 
-    /** Liefert die ID des markierten Hotels, oder null mit Hinweis falls nichts gewaehlt ist. */
+    /** Returns the ID of the selected hotel, or null with a message if nothing is selected. */
     private Integer selectedHotelId() {
         int row = table.getSelectedRow();
         if (row < 0) {

@@ -7,13 +7,13 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Dialog zum Anlegen und Bearbeiten einer Persona (US 12).
- * Das Kontrollkaestchen "Can delete hotels" setzt die Loeschberechtigung (US 13).
+ * Dialog for creating and editing a persona (US 12).
+ * The “Can delete hotels” checkbox sets the delete permission (US 13).
  */
 public class PersonaDialog extends JDialog {
 
     private final PersonaDAO personaDAO = new PersonaDAO();
-    private final Persona persona;        // null = neue Persona, sonst Bearbeiten
+    private final Persona persona;        // null = new persona, otherwise edit
     private boolean saved = false;
 
     private final JTextField     tfUsername = new JTextField();
@@ -63,13 +63,13 @@ public class PersonaDialog extends JDialog {
 
     private void fillFields(Persona p) {
         tfUsername.setText(p.getUsername());
-        tfUsername.setEditable(false);       // Username ist der Schluessel, nicht aenderbar
+        tfUsername.setEditable(false);       // The username is the key; it cannot be changed
         tfPassword.setText(p.getPassword());
         cbRole.setSelectedItem(p.getRole());
         chkCanDelete.setSelected(p.isCanDelete());
     }
 
-    /** US 12/13: Persona speichern. */
+    /** US 12/13: Save persona. */
     private void onSave() {
         String username = tfUsername.getText().trim();
         String password = new String(tfPassword.getPassword()).trim();

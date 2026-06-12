@@ -12,10 +12,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Stammdaten-Uebersicht fuer Senior User und Head of NOE-TO (US 1).
+ * Master Data Overview for Senior Users and Head of NOE-TO (US 1).
  *
- * Zeigt die Gesamtzahlen (Hotels, Zimmer, Betten) sowie eine
- * Aufschluesselung pro Kategorie.
+ * Displays the total figures (hotels, rooms, beds) as well as a breakdown by category.
  */
 public class DashboardPanel extends JPanel {
 
@@ -72,7 +71,7 @@ public class DashboardPanel extends JPanel {
         return p;
     }
 
-    /** US 1: Berechnet die Stammdaten-Uebersicht und fuellt Tabelle und Summen. */
+    /** US 1: Calculates the master data summary and populates the table and totals. */
     private void loadData() {
         model.setRowCount(0);
 
@@ -101,7 +100,7 @@ public class DashboardPanel extends JPanel {
         lblTotalBeds.setText(String.valueOf(totalBeds));
     }
 
-    /** Sammelt Zwischensummen einer Hotelkategorie. */
+    /** Sum the subtotals for a hotel category. */
     private static class CategoryStats {
         private int hotelCount;
         private int rooms;

@@ -6,24 +6,24 @@ import java.awt.*;
 import java.net.URL;
 
 /**
- * Laedt das NOE-Logo aus den Resources (US 17).
- * Das Logo liegt unter src/main/resources/Logo.jpg und wird im
- * Login-Fenster, im Hauptfenster und als Fenster-Icon verwendet.
+ * Download the NOE logo from the Resources section (US 17).
+ * The logo is located at src/main/resources/Logo.jpg and is used in the
+ * used in the login window, the main window, and as a window icon.
  */
 public class LogoHelper {
 
     private LogoHelper() {
-        // Utility-Klasse - keine Instanzen
+        // Utility class - no instances
     }
 
-    /** Logo als ImageIcon, auf die gewuenschte Hoehe skaliert (oder null). */
+    /** Logo as an image icon, scaled to the desired height (or zero). */
     public static ImageIcon getLogoIcon(int height) {
         Image image = loadImage();
         if (image == null) return null;
         return new ImageIcon(image.getScaledInstance(-1, height, Image.SCALE_SMOOTH));
     }
 
-    /** Logo als Image fuer das Fenster-Icon (oder null). */
+    /** Logo to use as the window icon (or none). */
     public static Image getLogoImage() {
         return loadImage();
     }
@@ -33,7 +33,7 @@ public class LogoHelper {
             URL url = LogoHelper.class.getResource("/Logo.jpg");
             return (url != null) ? ImageIO.read(url) : null;
         } catch (Exception e) {
-            return null;   // Logo ist optional - bei Fehler einfach keines anzeigen
+            return null;   // The logo is optional, if there's an error, just don't display one
         }
     }
 }

@@ -11,13 +11,13 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
 /**
- * Hotelansicht fuer den Hotel Representative.
+ * Hotel overview for the hotel representative.
  *
- * Deckt folgende User Stories ab:
- *   US 24 - Liste der eigenen, zugeordneten Hotels
- *   US 25 - Eigene Hoteldaten bearbeiten
+ * Covers the following user stories:
+ *   US 24 - List of your own assigned hotels
+ *   US 25 - Edit your hotel information
  *
- * Die zugeordneten Hotel-IDs stehen in der Session (beim Login geladen).
+ * The assigned hotel IDs are stored in the session (loaded upon login).
  */
 public class MyHotelsPanel extends JPanel {
 
@@ -55,7 +55,7 @@ public class MyHotelsPanel extends JPanel {
         return p;
     }
 
-    /** US 24: Laedt die dem Benutzer zugeordneten Hotels. */
+    /** US 24: Loads the hotels assigned to the user. */
     private void loadData() {
         model.setRowCount(0);
         for (Integer id : Session.getMyHotelIds()) {
@@ -69,7 +69,7 @@ public class MyHotelsPanel extends JPanel {
         }
     }
 
-    /** US 25: Eigenes Hotel bearbeiten (nur fuer zugeordnete Hotels erlaubt). */
+    /** US 25: Edit your own hotel (only allowed for assigned hotels). */
     private void onEdit() {
         int row = table.getSelectedRow();
         if (row < 0) {

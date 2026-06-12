@@ -8,11 +8,11 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
 /**
- * Benutzerverwaltung fuer den Senior User.
+ * User management for senior users.
  *
- * Deckt folgende User Stories ab:
- *   US 12 - Personas anlegen, auflisten, bearbeiten, loeschen
- *   US 13 - Loeschberechtigung pro Persona setzen (canDelete)
+ * Covers the following user stories:
+ *   US 12 - Create, list, edit, and delete personas
+ *   US 13 - Set delete permission per user (canDelete)
  */
 public class PersonaManagementPanel extends JPanel {
 
@@ -55,7 +55,7 @@ public class PersonaManagementPanel extends JPanel {
         return p;
     }
 
-    /** US 12: Laedt alle Personas in die Tabelle. */
+    /** US 12: Load all personas into the table. */
     private void loadData() {
         model.setRowCount(0);
         for (Persona p : personaDAO.findAll()) {
@@ -66,14 +66,14 @@ public class PersonaManagementPanel extends JPanel {
         }
     }
 
-    /** US 12: Neue Persona anlegen. */
+    /** US 12: Create a new persona. */
     private void onAdd() {
         PersonaDialog dialog = new PersonaDialog(parentFrame(), null);
         dialog.setVisible(true);
         if (dialog.wasSaved()) loadData();
     }
 
-    /** US 12/13: Ausgewaehlte Persona bearbeiten. */
+    /** US 12/13: Edit the selected persona. */
     private void onEdit() {
         Integer id = selectedPersonaId();
         if (id == null) return;
@@ -89,7 +89,7 @@ public class PersonaManagementPanel extends JPanel {
         if (dialog.wasSaved()) loadData();
     }
 
-    /** US 12: Ausgewaehlte Persona loeschen. */
+    /** US 12: Delete the selected persona. */
     private void onDelete() {
         Integer id = selectedPersonaId();
         if (id == null) return;
@@ -105,7 +105,7 @@ public class PersonaManagementPanel extends JPanel {
         }
     }
 
-    /** Liefert die ID der markierten Persona, oder null mit Hinweis falls nichts gewaehlt ist. */
+    /** Returns the ID of the selected persona, or null with a message if nothing is selected. */
     private Integer selectedPersonaId() {
         int row = table.getSelectedRow();
         if (row < 0) {

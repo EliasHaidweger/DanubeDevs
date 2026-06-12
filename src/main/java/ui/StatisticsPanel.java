@@ -13,11 +13,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Belegungsstatistik fuer Senior User und Head of NOE-TO.
+ * Occupancy statistics for Senior User and Head of NOE-TO.
  *
- * Bietet zwei Ansichten:
- *   US 2  - "By month/year": Belegung aller Hotels fuer einen Monat
- *   US 10 - "By hotel": Belegungen eines Hotels in einem Zeitraum (von/bis)
+ * Offers two views:
+ *   US 2  - “By month/year”: Availability of all hotels for a month
+ *   US 10 - “By hotel”: Room occupancy for a hotel during a specific period (from/to)
  */
 public class StatisticsPanel extends JPanel {
 
@@ -26,18 +26,18 @@ public class StatisticsPanel extends JPanel {
 
     private JComboBox<String>  cbView;
 
-    // Filter fuer US 2 ("By month/year")
+    // Filter for US 2 ("By month/year")
     private JComboBox<String>  cbMonth;
     private JComboBox<Integer> cbYear;
 
-    // Filter fuer US 10 ("By hotel" mit Zeitraum)
+    // Filter for US 10 ("By hotel" with timeperiod)
     private JComboBox<Hotel>   cbHotel;
     private JComboBox<String>  cbFromMonth;
     private JComboBox<Integer> cbFromYear;
     private JComboBox<String>  cbToMonth;
     private JComboBox<Integer> cbToYear;
 
-    // Panels die je nach View ein-/ausgeblendet werden
+    // Panels that are shown or hidden depending on the view
     private JPanel monthFilterPanel;
     private JPanel hotelFilterPanel;
 
@@ -60,8 +60,7 @@ public class StatisticsPanel extends JPanel {
         add(buildFilters(), BorderLayout.NORTH);
         add(buildTable(),   BorderLayout.CENTER);
 
-        // Auto-Refresh: jedes Mal wenn dieser Tab sichtbar wird,
-        // wird die Hotel-Liste neu geladen
+        // Auto-Refresh: every time this tab becomes visible, the hotel list is being reloaded
         addComponentListener(new java.awt.event.ComponentAdapter() {
             @Override
             public void componentShown(java.awt.event.ComponentEvent e) {
@@ -75,7 +74,7 @@ public class StatisticsPanel extends JPanel {
         main.setLayout(new BoxLayout(main, BoxLayout.Y_AXIS));
         main.setBorder(BorderFactory.createTitledBorder("Filter"));
 
-        // ====== Reihe 1: View-Auswahl ======
+        // ====== Row 1: View-Option ======
         JPanel viewPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         cbView = new JComboBox<>(new String[]{"By month/year", "By hotel"});
         cbView.addActionListener(e -> updateFilterVisibility());
@@ -83,7 +82,7 @@ public class StatisticsPanel extends JPanel {
         viewPanel.add(cbView);
         main.add(viewPanel);
 
-        // ====== Reihe 2: Filter fuer US 2 ======
+        // ====== Row 2: Filter for US 2 ======
         monthFilterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         cbMonth = new JComboBox<>(MONTHS);
         cbYear  = makeYearCombo();
@@ -91,7 +90,7 @@ public class StatisticsPanel extends JPanel {
         monthFilterPanel.add(new JLabel("Year:"));  monthFilterPanel.add(cbYear);
         main.add(monthFilterPanel);
 
-        // ====== Reihe 3: Filter fuer US 10 ======
+        // ====== Row 3: Filter for US 10 ======
         hotelFilterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         cbHotel = new JComboBox<>();
@@ -115,20 +114,20 @@ public class StatisticsPanel extends JPanel {
         hotelFilterPanel.add(cbToYear);
         main.add(hotelFilterPanel);
 
-        // ====== Reihe 4: Show ======
+        // ====== Row 4: Show ======
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JButton btnShow = new JButton("Show");
         btnShow.addActionListener(e -> loadData());
         buttonPanel.add(btnShow);
         main.add(buttonPanel);
 
-        // Default: nur "By month/year" anzeigen
+        // Default: only shows "By month/year"
         updateFilterVisibility();
 
         return main;
     }
 
-    /** Year-Combo mit festen Jahren 2000 - 2026. */
+    /** Year combo with fixed years 2000–2026. */
     private JComboBox<Integer> makeYearCombo() {
         Integer[] years = new Integer[27];        // 2000 - 2026
         for (int i = 0; i < years.length; i++) years[i] = 2000 + i;
@@ -138,7 +137,7 @@ public class StatisticsPanel extends JPanel {
     }
 
     /**
-     * Zeigt nur die zur gewaehlten View passenden Filter.
+     * Shows only the filters that match the selected view.
      */
     private void updateFilterVisibility() {
         String view = (String) cbView.getSelectedItem();
@@ -149,14 +148,14 @@ public class StatisticsPanel extends JPanel {
         repaint();
     }
 
-    /** Laedt die Hotel-Liste neu (fuer Auto-Refresh). */
+    /** Reload the hotel list (for auto-refresh). */
     private void refreshHotels() {
         Hotel previouslySelected = (Hotel) cbHotel.getSelectedItem();
 
         cbHotel.removeAllItems();
         for (Hotel h : hotelDAO.findAll()) cbHotel.addItem(h);
 
-        // Vorherige Auswahl wiederherstellen falls noch vorhanden
+        // Restore previous selection if available
         if (previouslySelected != null) {
             for (int i = 0; i < cbHotel.getItemCount(); i++) {
                 if (cbHotel.getItemAt(i).getId() == previouslySelected.getId()) {
@@ -186,7 +185,7 @@ public class StatisticsPanel extends JPanel {
         List<Occupancy> data;
 
         if ("By hotel".equals(view)) {
-            // US 10: ein Hotel, Zeitraum von/bis
+            // US 10: a hotel, dates from/to
             Hotel h = (Hotel) cbHotel.getSelectedItem();
             if (h == null) {
                 JOptionPane.showMessageDialog(this, "Please select a hotel.");
@@ -207,7 +206,7 @@ public class StatisticsPanel extends JPanel {
             data = occupancyDAO.findByHotelInRange(
                     h.getId(), fromYear, fromMonth, toYear, toMonth);
         } else {
-            // US 2: alle Hotels, ein Monat
+            // US 2: All hotels, one month
             int month = cbMonth.getSelectedIndex() + 1;
             int year  = (Integer) cbYear.getSelectedItem();
             data = occupancyDAO.findByMonth(year, month);

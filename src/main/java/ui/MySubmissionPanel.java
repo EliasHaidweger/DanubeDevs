@@ -13,14 +13,13 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
 /**
- * Belegungserfassung fuer den Hotel Representative.
+ * Room reservation entry for the hotel representative.
  *
- * Deckt folgende User Stories ab:
- *   US 26 - Eigene Belegung erfassen
- *   US 27 - Liste der eigenen, bereits erfassten Belegungen
+ * Covers the following user stories:
+ *   US 26 - Enter your own booking
+ *   US 27 - List of your own bookings that have already been entered
  *
- * Erfassen und Bearbeiten sind nur fuer die eigenen, zugeordneten
- * Hotels (Session) moeglich.
+ * Entering and editing are only available for your own assigned Hotels (session) are available.
  */
 public class MySubmissionPanel extends JPanel {
 
@@ -102,7 +101,7 @@ public class MySubmissionPanel extends JPanel {
         return p;
     }
 
-    /** US 26: Laedt die eigenen Hotels ins Dropdown. */
+    /** US 26: Load your own hotels into the dropdown menu. */
     private void loadMyHotels() {
         cbHotel.removeAllItems();
         for (Integer id : Session.getMyHotelIds()) {
@@ -120,7 +119,7 @@ public class MySubmissionPanel extends JPanel {
         tfBeds.setText(String.valueOf(h.getNoBeds()));
     }
 
-    /** US 27: Laedt alle bereits erfassten Belegungen der eigenen Hotels. */
+    /** US 27: Loads all existing reservations for your own hotels. */
     private void loadPast() {
         pastModel.setRowCount(0);
         for (Integer id : Session.getMyHotelIds()) {
@@ -137,7 +136,7 @@ public class MySubmissionPanel extends JPanel {
         }
     }
 
-    /** US 26: Eigene Belegung erfassen. */
+    /** US 26: Enter your own booking. */
     private void onSubmit() {
         Hotel h = (Hotel) cbHotel.getSelectedItem();
         if (h == null) {

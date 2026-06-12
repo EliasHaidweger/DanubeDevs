@@ -8,9 +8,8 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Anmeldedialog. Prueft Benutzername und Passwort gegen die persona-Tabelle.
- * Bei einem Hotel-Benutzer werden zusaetzlich die zugeordneten Hotel-IDs
- * in die Session geladen.
+ * Login dialog. Checks the username and password against the persona table.
+ * For a hotel user, the assigned hotel IDs are also loaded into the session.
  */
 public class LoginDialog extends JDialog {
 

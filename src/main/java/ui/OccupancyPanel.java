@@ -11,10 +11,9 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
 /**
- * Belegungserfassung fuer den Senior User (US 6).
+ * Room Reservation Entry for Senior Users (US 6).
  *
- * Das Hotel-Dropdown wird automatisch aktualisiert, sobald der Tab
- * angezeigt wird und nach jedem Speichern.
+ * The hotel dropdown is automatically updated as soon as the tab is displayed and after each save.
  */
 public class OccupancyPanel extends JPanel {
 
@@ -43,7 +42,7 @@ public class OccupancyPanel extends JPanel {
 
         loadHotels();
 
-        // Hotel-Liste neu laden, sobald der Tab sichtbar wird
+        // Reload the hotel list as soon as the tab becomes visible
         addComponentListener(new ComponentAdapter() {
             @Override public void componentShown(ComponentEvent e) { loadHotels(); }
         });
@@ -77,7 +76,7 @@ public class OccupancyPanel extends JPanel {
         return p;
     }
 
-    /** Laedt alle Hotels ins Dropdown und behaelt die bisherige Auswahl bei. */
+    /** Load all hotels into the dropdown menu and keep the current selection. */
     private void loadHotels() {
         Hotel previous = (Hotel) cbHotel.getSelectedItem();
 
@@ -95,7 +94,7 @@ public class OccupancyPanel extends JPanel {
         showSelectedHotelInfo();
     }
 
-    /** Fuellt ID, Zimmer- und Bettenzahl aus dem gewaehlten Hotel. */
+    /** Enter the ID, number of rooms, and number of beds for the selected hotel. */
     private void showSelectedHotelInfo() {
         Hotel h = (Hotel) cbHotel.getSelectedItem();
         if (h == null) {
@@ -109,7 +108,7 @@ public class OccupancyPanel extends JPanel {
         tfBeds.setText(String.valueOf(h.getNoBeds()));
     }
 
-    /** US 6: Belegung speichern. */
+    /** US 6: Save the reservation. */
     private void onSave() {
         Hotel h = (Hotel) cbHotel.getSelectedItem();
         if (h == null) {
