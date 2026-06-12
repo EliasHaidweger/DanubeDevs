@@ -4,7 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Statische Session - haelt fest wer eingeloggt ist.
+ * Haelt den Anmeldezustand waehrend der Programmlaufzeit fest:
+ * die aktuell angemeldete Persona und - bei einem Hotel-Benutzer -
+ * die IDs seiner zugeordneten Hotels.
+ *
+ * Bewusst KEINE Hibernate-Entity, sondern reiner Anwendungszustand.
  */
 public class Session {
 

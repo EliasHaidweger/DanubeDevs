@@ -7,30 +7,38 @@ import model.Session;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.util.List;
 
 /**
- * Hotel-Liste mit Add/Edit/Delete.
+ * Hotelverwaltung fuer den Senior User.
  *
- * Stories: #4 (Liste), #3 (Add), #5 (Edit), #11 (Delete), #13 (Permission).
+ * Deckt folgende User Stories ab:
+ *   US 4  - Liste aller Hotels
+ *   US 3  - Hotel anlegen (oeffnet HotelDialog)
+ *   US 5  - Hotel bearbeiten (oeffnet HotelDialog)
+ *   US 11 - Hotel loeschen (mit Bestaetigung)
+ *   US 13 - Loeschen nur mit Berechtigung (canDelete)
  */
 public class HotelListPanel extends JPanel {
 
-    private final HotelDAO dao = new HotelDAO();
-    private DefaultTableModel model;
-    private JTable table;
-    private JButton btnDelete;
+    private final HotelDAO hotelDAO = new HotelDAO();
+    private final DefaultTableModel model;
+    private final JTable table;
 
-    private final String[] columns = {
-            "ID", "Category", "Name", "City", "Rooms", "Beds", "Tags"
-    };
+    private static final String[] COLUMNS =
+            {"ID", "Category", "Name", "City", "Rooms", "Beds", "Tags"};
 
     public HotelListPanel() {
         setLayout(new BorderLayout(5, 5));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+        model = new DefaultTableModel(COLUMNS, 0) {
+            @Override public boolean isCellEditable(int row, int col) { return false; }
+        };
+        table = new JTable(model);
+        table.setRowHeight(24);
+
         add(buildToolbar(), BorderLayout.NORTH);
-        add(buildTable(),   BorderLayout.CENTER);
+        add(new JScrollPane(table), BorderLayout.CENTER);
 
         loadData();
     }
@@ -38,16 +46,16 @@ public class HotelListPanel extends JPanel {
     private JPanel buildToolbar() {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        JButton btnAdd     = new JButton("+ Add Hotel");
-        JButton btnEdit    = new JButton("Edit");
-        btnDelete          = new JButton("Delete");
+        JButton btnAdd    = new JButton("+ Add Hotel");
+        JButton btnEdit   = new JButton("Edit");
+        JButton btnDelete = new JButton("Delete");
 
         btnAdd.addActionListener(e -> onAdd());
         btnEdit.addActionListener(e -> onEdit());
         btnDelete.addActionListener(e -> onDelete());
 
-        // Story #13
-        if (Session.getCurrentPersona() == null || !Session.getCurrentPersona().isCanDelete()) {
+        // US 13: Delete nur fuer Personas mit Loeschberechtigung
+        if (!currentUserCanDelete()) {
             btnDelete.setEnabled(false);
             btnDelete.setToolTipText("You do not have permission to delete hotels.");
         }
@@ -58,19 +66,10 @@ public class HotelListPanel extends JPanel {
         return p;
     }
 
-    private JScrollPane buildTable() {
-        model = new DefaultTableModel(columns, 0) {
-            @Override public boolean isCellEditable(int r, int c) { return false; }
-        };
-        table = new JTable(model);
-        table.setRowHeight(24);
-        return new JScrollPane(table);
-    }
-
-    public void loadData() {
+    /** US 4: Laedt alle Hotels in die Tabelle. */
+    private void loadData() {
         model.setRowCount(0);
-        List<Hotel> hotels = dao.getAllHotels();
-        for (Hotel h : hotels) {
+        for (Hotel h : hotelDAO.findAll()) {
             model.addRow(new Object[]{
                     h.getId(), h.getCategory(), h.getName(),
                     h.getCity(), h.getNoRooms(), h.getNoBeds(), h.getTags()
@@ -78,60 +77,68 @@ public class HotelListPanel extends JPanel {
         }
     }
 
+    /** US 3: Neues Hotel anlegen. */
     private void onAdd() {
-        JFrame parent = (JFrame) SwingUtilities.getWindowAncestor(this);
-        HotelDialog dlg = new HotelDialog(parent, null);
-        dlg.setVisible(true);
-        if (dlg.wasSaved()) loadData();
+        HotelDialog dialog = new HotelDialog(parentFrame(), null);
+        dialog.setVisible(true);
+        if (dialog.wasSaved()) loadData();
     }
 
+    /** US 5: Ausgewaehltes Hotel bearbeiten. */
     private void onEdit() {
-        int row = table.getSelectedRow();
-        if (row < 0) {
-            JOptionPane.showMessageDialog(this, "Please select a hotel first.");
-            return;
-        }
-        int id = (int) model.getValueAt(row, 0);
-        Hotel h = dao.getHotelById(id);
-        if (h == null) {
+        Integer id = selectedHotelId();
+        if (id == null) return;
+
+        Hotel hotel = hotelDAO.findById(id);
+        if (hotel == null) {
             JOptionPane.showMessageDialog(this, "Hotel not found.");
             return;
         }
-        JFrame parent = (JFrame) SwingUtilities.getWindowAncestor(this);
-        HotelDialog dlg = new HotelDialog(parent, h);
-        dlg.setVisible(true);
-        if (dlg.wasSaved()) loadData();
+
+        HotelDialog dialog = new HotelDialog(parentFrame(), hotel);
+        dialog.setVisible(true);
+        if (dialog.wasSaved()) loadData();
     }
 
+    /** US 11 + US 13: Ausgewaehltes Hotel loeschen (mit Berechtigung und Bestaetigung). */
     private void onDelete() {
-        // Story #13: Zusaetzliche Sicherheitspruefung
-        // (zusaetzlich zum disabled Button - falls die Permission inzwischen entzogen wurde)
-        if (Session.getCurrentPersona() == null || !Session.getCurrentPersona().isCanDelete()) {
+        if (!currentUserCanDelete()) {
             JOptionPane.showMessageDialog(this,
-                    "You do not have permission to delete hotels.",
-                    "Permission denied",
-                    JOptionPane.WARNING_MESSAGE);
+                    "You do not have permission to delete hotels.");
             return;
         }
 
+        Integer id = selectedHotelId();
+        if (id == null) return;
+
+        String name = (String) model.getValueAt(table.getSelectedRow(), 2);
+        int confirm = JOptionPane.showConfirmDialog(this,
+                "Delete hotel '" + name + "' (ID " + id + ")?\n"
+              + "All linked occupancy data will also be deleted.",
+                "Confirm delete", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            hotelDAO.delete(id);
+            loadData();
+        }
+    }
+
+    /** Liefert die ID des markierten Hotels, oder null mit Hinweis falls nichts gewaehlt ist. */
+    private Integer selectedHotelId() {
         int row = table.getSelectedRow();
         if (row < 0) {
             JOptionPane.showMessageDialog(this, "Please select a hotel first.");
-            return;
+            return null;
         }
-        int id      = (int) model.getValueAt(row, 0);
-        String name = (String) model.getValueAt(row, 2);
+        return (int) model.getValueAt(row, 0);
+    }
 
-        int confirm = JOptionPane.showConfirmDialog(this,
-                "Delete hotel '" + name + "' (ID " + id + ")?\n"
-              + "All linked occupancy data will also be deleted!",
-                "Are you sure?",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE);
+    private boolean currentUserCanDelete() {
+        return Session.getCurrentPersona() != null
+            && Session.getCurrentPersona().isCanDelete();
+    }
 
-        if (confirm == JOptionPane.YES_OPTION) {
-            if (dao.deleteHotel(id)) loadData();
-            else JOptionPane.showMessageDialog(this, "Delete failed.");
-        }
+    private JFrame parentFrame() {
+        return (JFrame) SwingUtilities.getWindowAncestor(this);
     }
 }

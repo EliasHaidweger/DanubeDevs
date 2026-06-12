@@ -7,20 +7,20 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Add/Edit Persona Modal (Stories #12, #13).
+ * Dialog zum Anlegen und Bearbeiten einer Persona (US 12).
+ * Das Kontrollkaestchen "Can delete hotels" setzt die Loeschberechtigung (US 13).
  */
 public class PersonaDialog extends JDialog {
 
-    private final PersonaDAO dao = new PersonaDAO();
-    private final Persona persona;
+    private final PersonaDAO personaDAO = new PersonaDAO();
+    private final Persona persona;        // null = neue Persona, sonst Bearbeiten
     private boolean saved = false;
 
-    private JTextField     tfUsername  = new JTextField();
-    private JPasswordField tfPassword  = new JPasswordField();
-    private JComboBox<String> cbRole   = new JComboBox<>(new String[]{
-            Persona.ROLE_SENIOR, Persona.ROLE_HEAD, Persona.ROLE_HOTEL
-    });
-    private JCheckBox      chkCanDelete = new JCheckBox("Can delete hotels (Story #13)");
+    private final JTextField     tfUsername = new JTextField();
+    private final JPasswordField tfPassword = new JPasswordField();
+    private final JComboBox<String> cbRole  =
+            new JComboBox<>(new String[]{Persona.ROLE_SENIOR, Persona.ROLE_HEAD, Persona.ROLE_HOTEL});
+    private final JCheckBox chkCanDelete = new JCheckBox("Can delete hotels");
 
     public PersonaDialog(JFrame parent, Persona persona) {
         super(parent, true);
@@ -37,22 +37,16 @@ public class PersonaDialog extends JDialog {
         add(buildForm(), BorderLayout.CENTER);
         add(buildButtons(), BorderLayout.SOUTH);
 
-        if (persona != null) {
-            tfUsername.setText(persona.getUsername());
-            tfUsername.setEditable(false);
-            tfPassword.setText(persona.getPassword());
-            cbRole.setSelectedItem(persona.getRole());
-            chkCanDelete.setSelected(persona.isCanDelete());
-        }
+        if (persona != null) fillFields(persona);
     }
 
     private JPanel buildForm() {
         JPanel p = new JPanel(new GridLayout(0, 2, 8, 8));
         p.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        p.add(new JLabel("Username:"));    p.add(tfUsername);
-        p.add(new JLabel("Password:"));    p.add(tfPassword);
-        p.add(new JLabel("Role:"));        p.add(cbRole);
-        p.add(new JLabel(""));             p.add(chkCanDelete);
+        p.add(new JLabel("Username:")); p.add(tfUsername);
+        p.add(new JLabel("Password:")); p.add(tfPassword);
+        p.add(new JLabel("Role:"));     p.add(cbRole);
+        p.add(new JLabel(""));          p.add(chkCanDelete);
         return p;
     }
 
@@ -67,12 +61,21 @@ public class PersonaDialog extends JDialog {
         return p;
     }
 
+    private void fillFields(Persona p) {
+        tfUsername.setText(p.getUsername());
+        tfUsername.setEditable(false);       // Username ist der Schluessel, nicht aenderbar
+        tfPassword.setText(p.getPassword());
+        cbRole.setSelectedItem(p.getRole());
+        chkCanDelete.setSelected(p.isCanDelete());
+    }
+
+    /** US 12/13: Persona speichern. */
     private void onSave() {
         String username = tfUsername.getText().trim();
         String password = new String(tfPassword.getPassword()).trim();
 
         if (username.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Username and password required.");
+            JOptionPane.showMessageDialog(this, "Username and password are required.");
             return;
         }
 
@@ -82,14 +85,14 @@ public class PersonaDialog extends JDialog {
         p.setRole((String) cbRole.getSelectedItem());
         p.setCanDelete(chkCanDelete.isSelected());
 
-        boolean ok = (persona == null) ? dao.insertPersona(p) : dao.updatePersona(p);
-        if (ok) {
-            saved = true;
-            dispose();
-        } else {
-            JOptionPane.showMessageDialog(this, "Save failed (username already exists?).");
-        }
+        if (persona == null) personaDAO.save(p);
+        else                 personaDAO.update(p);
+
+        saved = true;
+        dispose();
     }
 
-    public boolean wasSaved() { return saved; }
+    public boolean wasSaved() {
+        return saved;
+    }
 }

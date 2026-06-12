@@ -5,15 +5,14 @@ import javax.swing.*;
 
 /**
  * Einstiegspunkt der Anwendung.
+ *
+ * Zeigt zuerst den Login-Dialog. Nach erfolgreichem Login oeffnet sich
+ * das Hauptfenster mit den fuer die jeweilige Rolle passenden Tabs.
  */
 public class Main {
 
     public static void main(String[] args) {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            // egal
-        }
+        applySystemLookAndFeel();
 
         SwingUtilities.invokeLater(() -> {
             LoginDialog login = new LoginDialog();
@@ -25,5 +24,14 @@ public class Main {
                 System.exit(0);
             }
         });
+    }
+
+    /** Verwendet das native Aussehen des Betriebssystems (statt des Java-Standards). */
+    private static void applySystemLookAndFeel() {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            // Faellt auf das Standard-Look-and-Feel zurueck - unkritisch
+        }
     }
 }

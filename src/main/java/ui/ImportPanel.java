@@ -19,17 +19,17 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * CSV-Import fuer Belegungsdaten (Story #16).
- * Nutzt Apache Commons CSV (siehe pom.xml).
+ * CSV-Import fuer Belegungsdaten (US 16).
+ * Nutzt Apache Commons CSV.
  *
- * Erwartet Header:
+ * Erwartetes Format (Semikolon-getrennt, UTF-8, erste Zeile = Header):
  *   hotel_id;rooms;usedrooms;beds;usedbeds;year;month
  *
- * Validierungen:
- * - Hotel-ID muss in der DB existieren
- * - Zahlen muessen gueltig sein
- * - usedrooms <= rooms, usedbeds <= beds
- * - Year zwischen 2000-2030, Month zwischen 1-12
+ * Validierungen je Zeile:
+ *   - Hotel-ID muss in der DB existieren
+ *   - alle Felder muessen gueltige Zahlen sein
+ *   - usedrooms <= rooms, usedbeds <= beds
+ *   - Year zwischen 2000-2030, Month zwischen 1-12
  */
 public class ImportPanel extends JPanel {
 
@@ -42,7 +42,7 @@ public class ImportPanel extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
         JTextArea info = new JTextArea(
-                "CSV Import for Occupancy Data (User Story #16)\n\n"
+                "CSV Import for Occupancy Data (US 16)\n\n"
               + "Expected file format (semicolon-separated, UTF-8, first line = header):\n"
               + "hotel_id;rooms;usedrooms;beds;usedbeds;year;month\n"
               + "1;152;81;300;123;2026;1\n"
@@ -81,7 +81,7 @@ public class ImportPanel extends JPanel {
 
         // Alle Hotel-IDs einmal vorab laden (fuer Validierung)
         Set<Integer> validHotelIds = new HashSet<>();
-        for (Hotel h : hotelDAO.getAllHotels()) {
+        for (Hotel h : hotelDAO.findAll()) {
             validHotelIds.add(h.getId());
         }
 
@@ -139,17 +139,13 @@ public class ImportPanel extends JPanel {
                     }
 
                     // ====== Speichern ======
-                    if (occupancyDAO.saveOccupancy(o)) {
-                        success++;
-                        taLog.append("Line " + lineNum + ": OK  -> Hotel "
-                                + o.getHotelId() + ", " + o.getYear() + "-"
-                                + String.format("%02d", o.getMonth())
-                                + " (used " + o.getUsedRooms() + "/" + o.getRooms()
-                                + " rooms)\n");
-                    } else {
-                        errors++;
-                        taLog.append("Line " + lineNum + ": FAIL - DB save failed\n");
-                    }
+                    occupancyDAO.save(o);
+                    success++;
+                    taLog.append("Line " + lineNum + ": OK  -> Hotel "
+                            + o.getHotelId() + ", " + o.getYear() + "-"
+                            + String.format("%02d", o.getMonth())
+                            + " (used " + o.getUsedRooms() + "/" + o.getRooms()
+                            + " rooms)\n");
                 } catch (Exception ex) {
                     errors++;
                     taLog.append("Line " + lineNum + ": ERROR - " + ex.getMessage() + "\n");

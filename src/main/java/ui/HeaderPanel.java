@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Zeigt das NOE-Logo oben (Story #17).
+ * Zeigt das NOE-Logo oben im Fenster (US 17).
  */
 public class HeaderPanel extends JPanel {
 

@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Help-Tab (Story #18).
+ * Hilfe-Tab mit Bedienungsanleitung (US 18).
  */
 public class HelpPanel extends JPanel {
 
@@ -43,7 +43,7 @@ public class HelpPanel extends JPanel {
           + "PERSONA MANAGEMENT (Senior only)\n"
           + "  Manage persona accounts and roles.\n"
           + "  'Can Delete' permission must be ticked for personas\n"
-          + "  who should be allowed to delete hotels (Story #13).\n\n"
+          + "  who should be allowed to delete hotels (US 13).\n\n"
 
           + "IMPORT (Senior only)\n"
           + "  Import occupancy data from a CSV file.\n"

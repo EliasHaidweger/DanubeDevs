@@ -13,11 +13,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Belegungsdaten-Statistik mit Filter.
+ * Belegungsstatistik fuer Senior User und Head of NOE-TO.
  *
- * Stories:
- *   #2  "By month/year": alle Hotels fuer EINEN Monat
- *   #10 "By hotel":      alle Belegungen EINES Hotels mit FROM/TO Zeitraum
+ * Bietet zwei Ansichten:
+ *   US 2  - "By month/year": Belegung aller Hotels fuer einen Monat
+ *   US 10 - "By hotel": Belegungen eines Hotels in einem Zeitraum (von/bis)
  */
 public class StatisticsPanel extends JPanel {
 
@@ -26,11 +26,11 @@ public class StatisticsPanel extends JPanel {
 
     private JComboBox<String>  cbView;
 
-    // Filter fuer "By month/year" (Story #2)
+    // Filter fuer US 2 ("By month/year")
     private JComboBox<String>  cbMonth;
     private JComboBox<Integer> cbYear;
 
-    // Filter fuer "By hotel" mit FROM/TO (Story #10)
+    // Filter fuer US 10 ("By hotel" mit Zeitraum)
     private JComboBox<Hotel>   cbHotel;
     private JComboBox<String>  cbFromMonth;
     private JComboBox<Integer> cbFromYear;
@@ -83,7 +83,7 @@ public class StatisticsPanel extends JPanel {
         viewPanel.add(cbView);
         main.add(viewPanel);
 
-        // ====== Reihe 2: Filter fuer "By month/year" (Story #2) ======
+        // ====== Reihe 2: Filter fuer US 2 ======
         monthFilterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         cbMonth = new JComboBox<>(MONTHS);
         cbYear  = makeYearCombo();
@@ -91,11 +91,11 @@ public class StatisticsPanel extends JPanel {
         monthFilterPanel.add(new JLabel("Year:"));  monthFilterPanel.add(cbYear);
         main.add(monthFilterPanel);
 
-        // ====== Reihe 3: Filter fuer "By hotel" mit FROM/TO (Story #10) ======
+        // ====== Reihe 3: Filter fuer US 10 ======
         hotelFilterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         cbHotel = new JComboBox<>();
-        for (Hotel h : hotelDAO.getAllHotels()) cbHotel.addItem(h);
+        for (Hotel h : hotelDAO.findAll()) cbHotel.addItem(h);
 
         cbFromMonth = new JComboBox<>(MONTHS);
         cbFromYear  = makeYearCombo();
@@ -154,7 +154,7 @@ public class StatisticsPanel extends JPanel {
         Hotel previouslySelected = (Hotel) cbHotel.getSelectedItem();
 
         cbHotel.removeAllItems();
-        for (Hotel h : hotelDAO.getAllHotels()) cbHotel.addItem(h);
+        for (Hotel h : hotelDAO.findAll()) cbHotel.addItem(h);
 
         // Vorherige Auswahl wiederherstellen falls noch vorhanden
         if (previouslySelected != null) {
@@ -180,13 +180,13 @@ public class StatisticsPanel extends JPanel {
         model.setRowCount(0);
 
         Map<Integer, Hotel> hotelMap = new HashMap<>();
-        for (Hotel h : hotelDAO.getAllHotels()) hotelMap.put(h.getId(), h);
+        for (Hotel h : hotelDAO.findAll()) hotelMap.put(h.getId(), h);
 
         String view = (String) cbView.getSelectedItem();
         List<Occupancy> data;
 
         if ("By hotel".equals(view)) {
-            // ====== Story #10 mit FROM/TO ======
+            // US 10: ein Hotel, Zeitraum von/bis
             Hotel h = (Hotel) cbHotel.getSelectedItem();
             if (h == null) {
                 JOptionPane.showMessageDialog(this, "Please select a hotel.");
@@ -204,13 +204,13 @@ public class StatisticsPanel extends JPanel {
                 return;
             }
 
-            data = occupancyDAO.getOccupanciesByHotelInRange(
+            data = occupancyDAO.findByHotelInRange(
                     h.getId(), fromYear, fromMonth, toYear, toMonth);
         } else {
-            // ====== Story #2 ======
+            // US 2: alle Hotels, ein Monat
             int month = cbMonth.getSelectedIndex() + 1;
             int year  = (Integer) cbYear.getSelectedItem();
-            data = occupancyDAO.getOccupanciesByMonth(year, month);
+            data = occupancyDAO.findByMonth(year, month);
         }
 
         if (data.isEmpty()) {

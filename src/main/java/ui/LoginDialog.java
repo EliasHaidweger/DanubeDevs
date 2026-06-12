@@ -8,15 +8,17 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Login-Dialog. Username + Password gegen persona-Tabelle.
+ * Anmeldedialog. Prueft Benutzername und Passwort gegen die persona-Tabelle.
+ * Bei einem Hotel-Benutzer werden zusaetzlich die zugeordneten Hotel-IDs
+ * in die Session geladen.
  */
 public class LoginDialog extends JDialog {
 
     private final PersonaDAO personaDAO = new PersonaDAO();
     private boolean loggedIn = false;
 
-    private JTextField     tfUsername = new JTextField(15);
-    private JPasswordField tfPassword = new JPasswordField(15);
+    private final JTextField     tfUsername = new JTextField(15);
+    private final JPasswordField tfPassword = new JPasswordField(15);
 
     public LoginDialog() {
         super((Frame) null, "Login - Lower Austria Tourist Portal", true);
@@ -69,7 +71,7 @@ public class LoginDialog extends JDialog {
         Session.setCurrentPersona(persona);
 
         if (Persona.ROLE_HOTEL.equals(persona.getRole())) {
-            Session.setMyHotelIds(personaDAO.getHotelIdsForPersona(persona.getId()));
+            Session.setMyHotelIds(personaDAO.findHotelIds(persona.getId()));
         }
 
         loggedIn = true;

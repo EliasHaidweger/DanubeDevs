@@ -21,11 +21,24 @@
 
         <property name="hibernate.show_sql">true</property>
         <property name="hibernate.format_sql">true</property>
+        <!--  ============================================================  -->
+        <!--   WICHTIG: Schema-Verwaltung                                   -->
+        <!--                                                                -->
+        <!--   "none"  = Hibernate fasst die Tabellen NICHT an.             -->
+        <!--             Bestehende Daten bleiben erhalten.                 -->
+        <!--                                                                -->
+        <!--   NIEMALS "create" oder "create-drop" verwenden -             -->
+        <!--   diese loeschen beim Start ALLE Daten und legen die          -->
+        <!--   Tabellen leer neu an!                                       -->
+        <!--                                                                -->
+        <!--   Das Schema kommt aus database.sql, nicht von Hibernate.     -->
+        <!--  ============================================================  -->
         <property name="hibernate.hbm2ddl.auto">none</property>
 
         <property name="hibernate.current_session_context_class">thread</property>
 
-
+        <!--  Entity-Klassen werden im Code registriert (HibernateUtil.java),
+                     daher keine <mapping>-Eintraege noetig.  -->
 
 
     </session-factory>

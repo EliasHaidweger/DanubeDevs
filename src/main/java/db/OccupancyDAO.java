@@ -7,78 +7,71 @@ import org.hibernate.Transaction;
 import java.util.List;
 
 /**
- * Occupancy-Datenzugriff ueber Hibernate.
+ * Datenzugriff fuer Belegungen (Occupancies) ueber Hibernate.
+ *
+ * Zustaendig fuer die Persistenz folgender User Stories:
+ *   US 2  - Belegung aller Hotels fuer einen Monat
+ *   US 6  - Belegung erfassen
+ *   US 10 - Belegungen eines Hotels in einem Zeitraum
+ *   US 27 - Alle eigenen Belegungen eines Hotels
  */
 public class OccupancyDAO {
 
-    /** Alle Belegungen eines Hotels (Story #10). */
-    public List<Occupancy> getOccupanciesByHotel(int hotelId) {
+    /** US 2: Belegungen aller Hotels fuer einen bestimmten Monat/Jahr. */
+    public List<Occupancy> findByMonth(int year, int month) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.createQuery(
-                    "FROM Occupancy o WHERE o.hotelId = :hid ORDER BY o.year DESC, o.month DESC",
+                    "FROM Occupancy o WHERE o.year = :year AND o.month = :month",
                     Occupancy.class)
-                    .setParameter("hid", hotelId)
+                    .setParameter("year", year)
+                    .setParameter("month", month)
                     .list();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return List.of();
         }
     }
 
-    /** Belegungen fuer einen bestimmten Monat/Jahr (Story #2). */
-    public List<Occupancy> getOccupanciesByMonth(int year, int month) {
+    /** US 27: Alle Belegungen eines Hotels (neueste zuerst). */
+    public List<Occupancy> findByHotel(int hotelId) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.createQuery(
-                    "FROM Occupancy o WHERE o.year = :y AND o.month = :m",
+                    "FROM Occupancy o WHERE o.hotelId = :hotelId ORDER BY o.year DESC, o.month DESC",
                     Occupancy.class)
-                    .setParameter("y", year)
-                    .setParameter("m", month)
+                    .setParameter("hotelId", hotelId)
                     .list();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return List.of();
         }
     }
 
     /**
-     * Belegungen eines Hotels in einem Zeitraum (Story #10 mit FROM/TO).
-     * Trick: (year*12 + month) ergibt eine fortlaufende Zahl zum Vergleichen.
+     * US 10: Belegungen eines Hotels in einem Zeitraum (von/bis Monat+Jahr).
+     * Der Ausdruck (year * 12 + month) bildet jeden Monat auf eine
+     * fortlaufende Zahl ab und macht den Bereichsvergleich einfach.
      */
-    public List<Occupancy> getOccupanciesByHotelInRange(int hotelId,
-                                                        int fromYear, int fromMonth,
-                                                        int toYear, int toMonth) {
+    public List<Occupancy> findByHotelInRange(int hotelId,
+                                              int fromYear, int fromMonth,
+                                              int toYear, int toMonth) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.createQuery(
-                    "FROM Occupancy o WHERE o.hotelId = :hid "
+                    "FROM Occupancy o WHERE o.hotelId = :hotelId "
                   + "AND (o.year * 12 + o.month) >= :from "
                   + "AND (o.year * 12 + o.month) <= :to "
                   + "ORDER BY o.year, o.month",
                     Occupancy.class)
-                    .setParameter("hid", hotelId)
+                    .setParameter("hotelId", hotelId)
                     .setParameter("from", fromYear * 12 + fromMonth)
                     .setParameter("to", toYear * 12 + toMonth)
                     .list();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return List.of();
         }
     }
 
     /**
-     * Speichern (INSERT oder UPDATE - Story #6).
-     * Hibernate's merge() macht automatisch INSERT wenn neu, UPDATE wenn vorhanden.
+     * US 6: Speichert eine Belegung.
+     * merge() fuegt neu ein oder aktualisiert, falls fuer diesen
+     * Schluessel (Hotel + Jahr + Monat) bereits ein Eintrag existiert.
      */
-    public boolean saveOccupancy(Occupancy o) {
-        Transaction tx = null;
+    public void save(Occupancy occupancy) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            tx = session.beginTransaction();
-            session.merge(o);
+            Transaction tx = session.beginTransaction();
+            session.merge(occupancy);
             tx.commit();
-            return true;
-        } catch (Exception e) {
-            if (tx != null) tx.rollback();
-            e.printStackTrace();
-            return false;
         }
     }
 }

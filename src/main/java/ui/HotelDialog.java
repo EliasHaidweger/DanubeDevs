@@ -7,26 +7,27 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Modal zum Hinzufuegen oder Bearbeiten eines Hotels (Story #3, #5).
+ * Dialog zum Anlegen (US 3) und Bearbeiten (US 5) eines Hotels.
+ * Die ID wird beim Speichern automatisch vergeben.
  */
 public class HotelDialog extends JDialog {
 
-    private final HotelDAO dao = new HotelDAO();
-    private final Hotel hotel;
+    private final HotelDAO hotelDAO = new HotelDAO();
+    private final Hotel hotel;        // null = neues Hotel, sonst Bearbeiten
     private boolean saved = false;
 
-    private JTextField tfId        = new JTextField();
-    private JComboBox<String> cbCategory = new JComboBox<>(new String[]{"*****","****","***","**","*"});
-    private JTextField tfName      = new JTextField();
-    private JTextField tfOwner     = new JTextField();
-    private JTextField tfContact   = new JTextField();
-    private JTextField tfAddress   = new JTextField();
-    private JTextField tfCity      = new JTextField();
-    private JTextField tfCityCode  = new JTextField();
-    private JTextField tfPhone     = new JTextField();
-    private JTextField tfRooms     = new JTextField();
-    private JTextField tfBeds      = new JTextField();
-    private JTextField tfTags      = new JTextField();
+    private final JComboBox<String> cbCategory =
+            new JComboBox<>(new String[]{"*****", "****", "***", "**", "*"});
+    private final JTextField tfName     = new JTextField();
+    private final JTextField tfOwner    = new JTextField();
+    private final JTextField tfContact  = new JTextField();
+    private final JTextField tfAddress  = new JTextField();
+    private final JTextField tfCity     = new JTextField();
+    private final JTextField tfCityCode = new JTextField();
+    private final JTextField tfPhone    = new JTextField();
+    private final JTextField tfRooms    = new JTextField("0");
+    private final JTextField tfBeds     = new JTextField("0");
+    private final JTextField tfTags     = new JTextField();
 
     public HotelDialog(JFrame parent, Hotel hotel) {
         super(parent, true);
@@ -36,35 +37,20 @@ public class HotelDialog extends JDialog {
         if (logo != null) setIconImage(logo);
 
         setTitle(hotel == null ? "Add new Hotel" : "Edit Hotel");
-        setSize(500, 520);
+        setSize(500, 480);
         setLocationRelativeTo(parent);
         setLayout(new BorderLayout());
 
         add(buildForm(), BorderLayout.CENTER);
         add(buildButtons(), BorderLayout.SOUTH);
 
-        // ID-Feld immer gesperrt
-        tfId.setEditable(false);
-        tfId.setBackground(new Color(240, 240, 240));
-
-        if (hotel != null) {
-            // Edit-Modus -> bestehende ID anzeigen
-            fillFields(hotel);
-        } else {
-            // Add-Modus -> Vorschau der naechsten ID anzeigen
-            int nextId = dao.getNextId();
-            tfId.setText(String.valueOf(nextId));
-            // Standard-Werte fuer Rooms/Beds (sonst NumberFormatException)
-            tfRooms.setText("0");
-            tfBeds.setText("0");
-        }
+        if (hotel != null) fillFields(hotel);
     }
 
     private JPanel buildForm() {
         JPanel p = new JPanel(new GridLayout(0, 2, 8, 8));
         p.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        p.add(new JLabel("Hotel ID (auto):"));   p.add(tfId);
         p.add(new JLabel("Category:"));          p.add(cbCategory);
         p.add(new JLabel("Hotel Name:"));        p.add(tfName);
         p.add(new JLabel("Owner:"));             p.add(tfOwner);
@@ -85,14 +71,12 @@ public class HotelDialog extends JDialog {
         JButton btnCancel = new JButton("Cancel");
         btnSave.addActionListener(e -> onSave());
         btnCancel.addActionListener(e -> dispose());
-        // Save zuerst (links), Cancel daneben (rechts)
         p.add(btnSave);
         p.add(btnCancel);
         return p;
     }
 
     private void fillFields(Hotel h) {
-        tfId.setText(String.valueOf(h.getId()));
         cbCategory.setSelectedItem(h.getCategory());
         tfName.setText(h.getName());
         tfOwner.setText(h.getOwner());
@@ -126,25 +110,23 @@ public class HotelDialog extends JDialog {
             h.setNoBeds(parseInt(tfBeds.getText()));
             h.setTags(tfTags.getText().trim());
 
-            boolean ok = (hotel == null) ? dao.insertHotel(h) : dao.updateHotel(h);
-            if (ok) {
-                saved = true;
-                dispose();
-            } else {
-                JOptionPane.showMessageDialog(this, "Saving failed - check console for details.");
-            }
+            if (hotel == null) hotelDAO.save(h);
+            else               hotelDAO.update(h);
+
+            saved = true;
+            dispose();
+
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Invalid number in Rooms/Beds.");
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
-            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Rooms and beds must be numbers.");
         }
     }
 
-    private int parseInt(String s) {
-        if (s == null || s.trim().isEmpty()) return 0;
-        return Integer.parseInt(s.trim());
+    private int parseInt(String text) {
+        String t = text.trim();
+        return t.isEmpty() ? 0 : Integer.parseInt(t);
     }
 
-    public boolean wasSaved() { return saved; }
+    public boolean wasSaved() {
+        return saved;
+    }
 }

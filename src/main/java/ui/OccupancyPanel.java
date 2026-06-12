@@ -9,28 +9,30 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.util.List;
 
 /**
- * Belegung eintragen (Story #6).
+ * Belegungserfassung fuer den Senior User (US 6).
  *
- * Auto-Refresh: Das Hotel-Dropdown wird automatisch neu geladen, sobald
- * der Tab angezeigt wird (ComponentListener) UND nach jedem Speichern.
- * Kein Refresh-Button noetig.
+ * Das Hotel-Dropdown wird automatisch aktualisiert, sobald der Tab
+ * angezeigt wird und nach jedem Speichern.
  */
 public class OccupancyPanel extends JPanel {
+
+    private static final String[] MONTHS = {
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"};
 
     private final HotelDAO     hotelDAO     = new HotelDAO();
     private final OccupancyDAO occupancyDAO = new OccupancyDAO();
 
-    private JComboBox<Hotel>   cbHotel;
-    private JTextField         tfHotelId   = new JTextField();
-    private JComboBox<String>  cbMonth;
-    private JComboBox<Integer> cbYear;
-    private JTextField         tfRooms     = new JTextField();
-    private JTextField         tfUsedRooms = new JTextField();
-    private JTextField         tfBeds      = new JTextField();
-    private JTextField         tfUsedBeds  = new JTextField();
+    private final JComboBox<Hotel>   cbHotel    = new JComboBox<>();
+    private final JTextField         tfHotelId  = new JTextField();
+    private final JComboBox<String>  cbMonth    = new JComboBox<>(MONTHS);
+    private final JComboBox<Integer> cbYear     = buildYearCombo();
+    private final JTextField         tfRooms    = new JTextField();
+    private final JTextField         tfUsedRooms = new JTextField();
+    private final JTextField         tfBeds     = new JTextField();
+    private final JTextField         tfUsedBeds = new JTextField();
 
     public OccupancyPanel() {
         setLayout(new BorderLayout());
@@ -41,13 +43,9 @@ public class OccupancyPanel extends JPanel {
 
         loadHotels();
 
-        // Auto-Refresh: jedes Mal wenn dieser Tab sichtbar wird,
-        // werden die Hotels neu geladen (falls inzwischen welche dazukamen)
+        // Hotel-Liste neu laden, sobald der Tab sichtbar wird
         addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentShown(ComponentEvent e) {
-                loadHotels();
-            }
+            @Override public void componentShown(ComponentEvent e) { loadHotels(); }
         });
     }
 
@@ -55,29 +53,19 @@ public class OccupancyPanel extends JPanel {
         JPanel p = new JPanel(new GridLayout(0, 2, 10, 10));
         p.setBorder(BorderFactory.createTitledBorder("Enter monthly occupancy"));
 
-        cbHotel = new JComboBox<>();
-        cbHotel.addActionListener(e -> updateHotelInfo());
+        cbHotel.addActionListener(e -> showSelectedHotelInfo());
 
         tfHotelId.setEditable(false);
         tfHotelId.setBackground(new Color(240, 240, 240));
 
-        String[] months = {"January","February","March","April","May","June",
-                "July","August","September","October","November","December"};
-        cbMonth = new JComboBox<>(months);
-
-        Integer[] years = new Integer[27];               // 2000 - 2026
-        for (int i = 0; i < years.length; i++) years[i] = 2000 + i;
-        cbYear = new JComboBox<>(years);
-        cbYear.setSelectedItem(2026);
-
-        p.add(new JLabel("Hotel:"));            p.add(cbHotel);
-        p.add(new JLabel("Hotel ID (auto):"));  p.add(tfHotelId);
-        p.add(new JLabel("Month:"));            p.add(cbMonth);
-        p.add(new JLabel("Year:"));             p.add(cbYear);
-        p.add(new JLabel("Total rooms:"));      p.add(tfRooms);
-        p.add(new JLabel("Used rooms:"));       p.add(tfUsedRooms);
-        p.add(new JLabel("Total beds:"));       p.add(tfBeds);
-        p.add(new JLabel("Used beds:"));        p.add(tfUsedBeds);
+        p.add(new JLabel("Hotel:"));           p.add(cbHotel);
+        p.add(new JLabel("Hotel ID (auto):")); p.add(tfHotelId);
+        p.add(new JLabel("Month:"));           p.add(cbMonth);
+        p.add(new JLabel("Year:"));            p.add(cbYear);
+        p.add(new JLabel("Total rooms:"));     p.add(tfRooms);
+        p.add(new JLabel("Used rooms:"));      p.add(tfUsedRooms);
+        p.add(new JLabel("Total beds:"));      p.add(tfBeds);
+        p.add(new JLabel("Used beds:"));       p.add(tfUsedBeds);
         return p;
     }
 
@@ -89,39 +77,39 @@ public class OccupancyPanel extends JPanel {
         return p;
     }
 
-    /** Laedt alle Hotels aus der DB ins Dropdown. */
+    /** Laedt alle Hotels ins Dropdown und behaelt die bisherige Auswahl bei. */
     private void loadHotels() {
-        Hotel previouslySelected = (Hotel) cbHotel.getSelectedItem();
+        Hotel previous = (Hotel) cbHotel.getSelectedItem();
 
         cbHotel.removeAllItems();
-        List<Hotel> hotels = hotelDAO.getAllHotels();
-        for (Hotel h : hotels) cbHotel.addItem(h);
+        for (Hotel h : hotelDAO.findAll()) cbHotel.addItem(h);
 
-        // Vorherige Auswahl wiederherstellen (falls noch vorhanden)
-        if (previouslySelected != null) {
+        if (previous != null) {
             for (int i = 0; i < cbHotel.getItemCount(); i++) {
-                if (cbHotel.getItemAt(i).getId() == previouslySelected.getId()) {
+                if (cbHotel.getItemAt(i).getId() == previous.getId()) {
                     cbHotel.setSelectedIndex(i);
                     break;
                 }
             }
         }
-        updateHotelInfo();
+        showSelectedHotelInfo();
     }
 
-    private void updateHotelInfo() {
+    /** Fuellt ID, Zimmer- und Bettenzahl aus dem gewaehlten Hotel. */
+    private void showSelectedHotelInfo() {
         Hotel h = (Hotel) cbHotel.getSelectedItem();
-        if (h != null) {
-            tfHotelId.setText(String.valueOf(h.getId()));
-            tfRooms.setText(String.valueOf(h.getNoRooms()));
-            tfBeds.setText(String.valueOf(h.getNoBeds()));
-        } else {
+        if (h == null) {
             tfHotelId.setText("");
             tfRooms.setText("");
             tfBeds.setText("");
+            return;
         }
+        tfHotelId.setText(String.valueOf(h.getId()));
+        tfRooms.setText(String.valueOf(h.getNoRooms()));
+        tfBeds.setText(String.valueOf(h.getNoBeds()));
     }
 
+    /** US 6: Belegung speichern. */
     private void onSave() {
         Hotel h = (Hotel) cbHotel.getSelectedItem();
         if (h == null) {
@@ -147,17 +135,22 @@ public class OccupancyPanel extends JPanel {
                 return;
             }
 
-            if (occupancyDAO.saveOccupancy(o)) {
-                JOptionPane.showMessageDialog(this, "Occupancy saved!");
-                tfUsedRooms.setText("");
-                tfUsedBeds.setText("");
-                // Auto-Refresh nach Speichern
-                loadHotels();
-            } else {
-                JOptionPane.showMessageDialog(this, "Save failed.");
-            }
+            occupancyDAO.save(o);
+            JOptionPane.showMessageDialog(this, "Occupancy saved.");
+            tfUsedRooms.setText("");
+            tfUsedBeds.setText("");
+            loadHotels();
+
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "All number fields must be numbers.");
+            JOptionPane.showMessageDialog(this, "All number fields must contain numbers.");
         }
+    }
+
+    private static JComboBox<Integer> buildYearCombo() {
+        Integer[] years = new Integer[27];          // 2000 - 2026
+        for (int i = 0; i < years.length; i++) years[i] = 2000 + i;
+        JComboBox<Integer> cb = new JComboBox<>(years);
+        cb.setSelectedItem(2026);
+        return cb;
     }
 }

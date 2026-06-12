@@ -5,117 +5,96 @@ import model.PersonaHotel;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Persona-Datenzugriff ueber Hibernate.
+ * Datenzugriff fuer Personas (Benutzerkonten) ueber Hibernate.
+ *
+ * Zustaendig fuer:
+ *   Login   - Authentifizierung
+ *   US 12   - Personas verwalten (anlegen, auflisten, bearbeiten, loeschen)
+ *   US 13   - Loeschberechtigung (Feld canDelete)
+ *   US 24   - Hotelzuordnung einer Hotel-Persona
  */
 public class PersonaDAO {
 
-    /** Login pruefen. */
+    /** Prueft Login-Daten und liefert die passende Persona (oder null). */
     public Persona login(String username, String password) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.createQuery(
-                    "FROM Persona p WHERE p.username = :u AND p.password = :pw",
+                    "FROM Persona p WHERE p.username = :username AND p.password = :password",
                     Persona.class)
-                    .setParameter("u", username)
-                    .setParameter("pw", password)
+                    .setParameter("username", username)
+                    .setParameter("password", password)
                     .uniqueResult();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
         }
     }
 
-    /** Alle Personas (Story #12). */
-    public List<Persona> getAllPersonas() {
+    /** US 12: Liefert alle Personas, sortiert nach ID. */
+    public List<Persona> findAll() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.createQuery("FROM Persona ORDER BY id", Persona.class).list();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return List.of();
         }
     }
 
-    /** Naechste freie ID (max + 1). */
-    public int getNextId() {
+    /** Liefert eine Persona anhand ihrer ID (oder null). */
+    public Persona findById(int id) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.get(Persona.class, id);
+        }
+    }
+
+    /** US 12: Legt eine neue Persona an. Die ID wird fortlaufend vergeben (max + 1). */
+    public void save(Persona persona) {
+        persona.setId(nextId());
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Transaction tx = session.beginTransaction();
+            session.persist(persona);
+            tx.commit();
+        }
+    }
+
+    /** US 12/13: Aktualisiert eine bestehende Persona (z.B. Rolle oder Loeschrecht). */
+    public void update(Persona persona) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Transaction tx = session.beginTransaction();
+            session.merge(persona);
+            tx.commit();
+        }
+    }
+
+    /** US 12: Loescht eine Persona samt ihrer Hotelzuordnungen. */
+    public void delete(int id) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Transaction tx = session.beginTransaction();
+
+            session.createMutationQuery("DELETE FROM PersonaHotel ph WHERE ph.personaId = :id")
+                   .setParameter("id", id).executeUpdate();
+
+            Persona persona = session.get(Persona.class, id);
+            if (persona != null) session.remove(persona);
+
+            tx.commit();
+        }
+    }
+
+    /** US 24: Liefert die Hotel-IDs, die einer Hotel-Persona zugeordnet sind. */
+    public List<Integer> findHotelIds(int personaId) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery(
+                    "SELECT ph.hotelId FROM PersonaHotel ph WHERE ph.personaId = :personaId",
+                    Integer.class)
+                    .setParameter("personaId", personaId)
+                    .list();
+        }
+    }
+
+    /** Naechste freie ID (max + 1) - vermeidet Luecken und IDENTITY-Spruenge. */
+    private int nextId() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             Integer maxId = session.createQuery("SELECT MAX(p.id) FROM Persona p", Integer.class)
                                    .uniqueResult();
             return (maxId == null) ? 1 : maxId + 1;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return 1;
-        }
-    }
-
-    /** Persona hinzufuegen (Story #12). ID = max + 1. */
-    public boolean insertPersona(Persona p) {
-        p.setId(getNextId());
-
-        Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            tx = session.beginTransaction();
-            session.persist(p);
-            tx.commit();
-            return true;
-        } catch (Exception e) {
-            if (tx != null) tx.rollback();
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    /** Persona aktualisieren (Story #13). */
-    public boolean updatePersona(Persona p) {
-        Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            tx = session.beginTransaction();
-            session.merge(p);
-            tx.commit();
-            return true;
-        } catch (Exception e) {
-            if (tx != null) tx.rollback();
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    /** Persona loeschen (inkl. ihrer Hotel-Verknuepfungen). */
-    public boolean deletePersona(int id) {
-        Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            tx = session.beginTransaction();
-
-            // Erst die Verknuepfungen in persona_hotels
-            session.createMutationQuery("DELETE FROM PersonaHotel ph WHERE ph.personaId = :id")
-                   .setParameter("id", id).executeUpdate();
-
-            // Dann die Persona selbst
-            Persona p = session.get(Persona.class, id);
-            if (p != null) session.remove(p);
-
-            tx.commit();
-            return true;
-        } catch (Exception e) {
-            if (tx != null) tx.rollback();
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    /** Welche Hotel-IDs gehoeren einer Hotel-Rep-Persona? */
-    public List<Integer> getHotelIdsForPersona(int personaId) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.createQuery(
-                    "SELECT ph.hotelId FROM PersonaHotel ph WHERE ph.personaId = :id",
-                    Integer.class)
-                    .setParameter("id", personaId)
-                    .list();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ArrayList<>();
         }
     }
 }

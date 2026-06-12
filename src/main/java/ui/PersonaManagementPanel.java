@@ -6,45 +6,44 @@ import model.Persona;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.util.List;
 
 /**
- * Persona Management (Story #12, #13).
+ * Benutzerverwaltung fuer den Senior User.
+ *
+ * Deckt folgende User Stories ab:
+ *   US 12 - Personas anlegen, auflisten, bearbeiten, loeschen
+ *   US 13 - Loeschberechtigung pro Persona setzen (canDelete)
  */
 public class PersonaManagementPanel extends JPanel {
 
-    private final PersonaDAO dao = new PersonaDAO();
-    private DefaultTableModel model;
-    private JTable table;
+    private final PersonaDAO personaDAO = new PersonaDAO();
+    private final DefaultTableModel model;
+    private final JTable table;
 
-    private final String[] columns = {
-            "ID", "Username", "Role", "Can Delete"
-    };
+    private static final String[] COLUMNS = {"ID", "Username", "Role", "Can Delete"};
 
     public PersonaManagementPanel() {
         setLayout(new BorderLayout(5, 5));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+        model = new DefaultTableModel(COLUMNS, 0) {
+            @Override public boolean isCellEditable(int row, int col) { return false; }
+        };
+        table = new JTable(model);
+        table.setRowHeight(24);
+
         add(buildToolbar(), BorderLayout.NORTH);
-        add(buildTable(),   BorderLayout.CENTER);
+        add(new JScrollPane(table), BorderLayout.CENTER);
 
         loadData();
-
-        // Auto-Refresh: jedes Mal wenn dieser Tab sichtbar wird neu laden
-        addComponentListener(new java.awt.event.ComponentAdapter() {
-            @Override
-            public void componentShown(java.awt.event.ComponentEvent e) {
-                loadData();
-            }
-        });
     }
 
     private JPanel buildToolbar() {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        JButton btnAdd     = new JButton("+ Add Persona");
-        JButton btnEdit    = new JButton("Edit");
-        JButton btnDelete  = new JButton("Delete");
+        JButton btnAdd    = new JButton("+ Add Persona");
+        JButton btnEdit   = new JButton("Edit");
+        JButton btnDelete = new JButton("Delete");
 
         btnAdd.addActionListener(e -> onAdd());
         btnEdit.addActionListener(e -> onEdit());
@@ -56,69 +55,67 @@ public class PersonaManagementPanel extends JPanel {
         return p;
     }
 
-    private JScrollPane buildTable() {
-        model = new DefaultTableModel(columns, 0) {
-            @Override public boolean isCellEditable(int r, int c) { return false; }
-        };
-        table = new JTable(model);
-        table.setRowHeight(24);
-        return new JScrollPane(table);
-    }
-
-    public void loadData() {
+    /** US 12: Laedt alle Personas in die Tabelle. */
+    private void loadData() {
         model.setRowCount(0);
-        List<Persona> personas = dao.getAllPersonas();
-        for (Persona p : personas) {
+        for (Persona p : personaDAO.findAll()) {
             model.addRow(new Object[]{
-                    p.getId(),
-                    p.getUsername(),
-                    p.getRoleLabel(),
+                    p.getId(), p.getUsername(), p.getRoleLabel(),
                     p.isCanDelete() ? "Yes" : "No"
             });
         }
     }
 
+    /** US 12: Neue Persona anlegen. */
     private void onAdd() {
-        PersonaDialog dlg = new PersonaDialog((JFrame) SwingUtilities.getWindowAncestor(this), null);
-        dlg.setVisible(true);
-        if (dlg.wasSaved()) loadData();
+        PersonaDialog dialog = new PersonaDialog(parentFrame(), null);
+        dialog.setVisible(true);
+        if (dialog.wasSaved()) loadData();
     }
 
+    /** US 12/13: Ausgewaehlte Persona bearbeiten. */
     private void onEdit() {
-        int row = table.getSelectedRow();
-        if (row < 0) {
-            JOptionPane.showMessageDialog(this, "Please select a persona first.");
+        Integer id = selectedPersonaId();
+        if (id == null) return;
+
+        Persona persona = personaDAO.findById(id);
+        if (persona == null) {
+            JOptionPane.showMessageDialog(this, "Persona not found.");
             return;
         }
-        int id = (int) model.getValueAt(row, 0);
-        for (Persona p : dao.getAllPersonas()) {
-            if (p.getId() == id) {
-                PersonaDialog dlg = new PersonaDialog((JFrame) SwingUtilities.getWindowAncestor(this), p);
-                dlg.setVisible(true);
-                if (dlg.wasSaved()) loadData();
-                return;
-            }
-        }
+
+        PersonaDialog dialog = new PersonaDialog(parentFrame(), persona);
+        dialog.setVisible(true);
+        if (dialog.wasSaved()) loadData();
     }
 
+    /** US 12: Ausgewaehlte Persona loeschen. */
     private void onDelete() {
-        int row = table.getSelectedRow();
-        if (row < 0) {
-            JOptionPane.showMessageDialog(this, "Please select a persona first.");
-            return;
-        }
-        int id = (int) model.getValueAt(row, 0);
-        String username = (String) model.getValueAt(row, 1);
+        Integer id = selectedPersonaId();
+        if (id == null) return;
 
+        String username = (String) model.getValueAt(table.getSelectedRow(), 1);
         int confirm = JOptionPane.showConfirmDialog(this,
                 "Delete persona '" + username + "'?",
-                "Are you sure?",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE);
+                "Confirm delete", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 
         if (confirm == JOptionPane.YES_OPTION) {
-            if (dao.deletePersona(id)) loadData();
-            else JOptionPane.showMessageDialog(this, "Delete failed.");
+            personaDAO.delete(id);
+            loadData();
         }
+    }
+
+    /** Liefert die ID der markierten Persona, oder null mit Hinweis falls nichts gewaehlt ist. */
+    private Integer selectedPersonaId() {
+        int row = table.getSelectedRow();
+        if (row < 0) {
+            JOptionPane.showMessageDialog(this, "Please select a persona first.");
+            return null;
+        }
+        return (int) model.getValueAt(row, 0);
+    }
+
+    private JFrame parentFrame() {
+        return (JFrame) SwingUtilities.getWindowAncestor(this);
     }
 }
