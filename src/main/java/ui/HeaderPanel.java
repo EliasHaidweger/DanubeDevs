@@ -5,6 +5,7 @@ import java.awt.*;
 
 /**
  * Displays the NOE logo at the top of the window (US 17).
+ *
  */
 public class HeaderPanel extends JPanel {
 
