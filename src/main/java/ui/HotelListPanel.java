@@ -86,3 +86,10 @@ public class HotelListPanel extends JPanel {
             return (JFrame) SwingUtilities.getWindowAncestor(this);
         }
     }
+
+    /** US 3: Create a new hotel. */
+    private void onAdd() {
+        HotelDialog dialog = new HotelDialog(parentFrame(), null);
+        dialog.setVisible(true);
+        if (dialog.wasSaved()) loadData();
+    }
