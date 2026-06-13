@@ -6,6 +6,7 @@ import lombok.Data;
 /**
  * Hibernate entity for the occupancies table.
  *
+ *
  * Special feature: composite primary key (hotel_id + year + month).
  * That's why @IdClass(OccupancyId.class) and 3 fields with @Id.
  */
