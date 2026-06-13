@@ -1,5 +1,6 @@
 package ui;
 
+import db.HotelDAO;
 import model.Hotel;
 
 import javax.swing.*;
