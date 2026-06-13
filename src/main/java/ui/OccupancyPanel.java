@@ -12,7 +12,6 @@ import java.awt.event.ComponentEvent;
 
 /**
  * Room Reservation Entry for Senior Users (US 6).
- *
  * The hotel dropdown is automatically updated as soon as the tab is displayed and after each save.
  */
 public class OccupancyPanel extends JPanel {
