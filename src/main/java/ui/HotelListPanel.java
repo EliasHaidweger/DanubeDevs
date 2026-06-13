@@ -46,13 +46,24 @@ public class HotelListPanel extends JPanel {
     private JPanel buildToolbar() {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        JButton btnAdd = new JButton("+ Add Hotel");
-        JButton btnEdit = new JButton("Edit");
+        JButton btnAdd    = new JButton("+ Add Hotel");
+        JButton btnEdit   = new JButton("Edit");
         JButton btnDelete = new JButton("Delete");
 
         btnAdd.addActionListener(e -> onAdd());
         btnEdit.addActionListener(e -> onEdit());
         btnDelete.addActionListener(e -> onDelete());
+
+        // US 13: Delete nur fuer Personas mit Loeschberechtigung
+        if (!currentUserCanDelete()) {
+            btnDelete.setEnabled(false);
+            btnDelete.setToolTipText("You do not have permission to delete hotels.");
+        }
+
+        p.add(btnAdd);
+        p.add(btnEdit);
+        p.add(btnDelete);
+        return p;
     }
 
 
