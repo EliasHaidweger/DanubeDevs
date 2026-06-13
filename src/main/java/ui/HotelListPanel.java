@@ -32,7 +32,10 @@ public class HotelListPanel extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         model = new DefaultTableModel(COLUMNS, 0) {
-            @Override public boolean isCellEditable(int row, int col) { return false; }
+            @Override
+            public boolean isCellEditable(int row, int col) {
+                return false;
+            }
         };
         table = new JTable(model);
         table.setRowHeight(24);
@@ -46,7 +49,7 @@ public class HotelListPanel extends JPanel {
     private JPanel buildToolbar() {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        JButton btnAdd    = new JButton("+ Add Hotel");
+        JButton btnAdd = new JButton("+ Add Hotel");
         JButton btnEdit   = new JButton("Edit");
         JButton btnDelete = new JButton("Delete");
 
