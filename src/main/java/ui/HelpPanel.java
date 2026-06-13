@@ -3,6 +3,10 @@ package ui;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Help tab with user manual (US 18).
+ */
+
 public class HelpPanel extends JPanel {
 
     public HelpPanel() {
