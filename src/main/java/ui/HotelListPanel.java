@@ -66,10 +66,30 @@ public class HotelListPanel extends JPanel {
         return p;
     }
 
+    /** US 3: Create a new hotel. */
+    private void onAdd() {
+        HotelDialog dialog = new HotelDialog(parentFrame(), null);
+        dialog.setVisible(true);
+        if (dialog.wasSaved()) loadData();
+    }
 
+    /** US 5: Edit selected hotel. */
+    private void onEdit() {
+        Integer id = selectedHotelId();
+        if (id == null) return;
 
+        Hotel hotel = hotelDAO.findById(id);
+        if (hotel == null) {
+            JOptionPane.showMessageDialog(this, "Hotel not found.");
+            return;
+        }
 
-        /** Returns the ID of the selected hotel, or null with a message if nothing is selected. */
+        HotelDialog dialog = new HotelDialog(parentFrame(), hotel);
+        dialog.setVisible(true);
+        if (dialog.wasSaved()) loadData();
+    }
+
+    /** Returns the ID of the selected hotel, or null with a message if nothing is selected. */
         private Integer selectedHotelId() {
             int row = table.getSelectedRow();
             if (row < 0) {
