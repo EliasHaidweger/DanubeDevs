@@ -89,6 +89,29 @@ public class HotelListPanel extends JPanel {
         if (dialog.wasSaved()) loadData();
     }
 
+    /** US 11 + US 13: Delete selected hotel (with authorization and confirmation). */
+    private void onDelete() {
+        if (!currentUserCanDelete()) {
+            JOptionPane.showMessageDialog(this,
+                    "You do not have permission to delete hotels.");
+            return;
+        }
+
+        Integer id = selectedHotelId();
+        if (id == null) return;
+
+        String name = (String) model.getValueAt(table.getSelectedRow(), 2);
+        int confirm = JOptionPane.showConfirmDialog(this,
+                "Delete hotel '" + name + "' (ID " + id + ")?\n"
+                        + "All linked occupancy data will also be deleted.",
+                "Confirm delete", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            hotelDAO.delete(id);
+            loadData();
+        }
+    }
+
     /** Returns the ID of the selected hotel, or null with a message if nothing is selected. */
         private Integer selectedHotelId() {
             int row = table.getSelectedRow();
