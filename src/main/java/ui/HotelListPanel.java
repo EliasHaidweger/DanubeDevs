@@ -93,3 +93,19 @@ public class HotelListPanel extends JPanel {
         dialog.setVisible(true);
         if (dialog.wasSaved()) loadData();
     }
+
+    /** US 5: Edit selected hotel. */
+    private void onEdit() {
+        Integer id = selectedHotelId();
+        if (id == null) return;
+
+        Hotel hotel = hotelDAO.findById(id);
+        if (hotel == null) {
+            JOptionPane.showMessageDialog(this, "Hotel not found.");
+            return;
+        }
+
+        HotelDialog dialog = new HotelDialog(parentFrame(), hotel);
+        dialog.setVisible(true);
+        if (dialog.wasSaved()) loadData();
+    }
