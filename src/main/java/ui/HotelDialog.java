@@ -5,7 +5,10 @@ import model.Hotel;
 import javax.swing.*;
 import java.awt.*;
 
-
+/**
+ * Dialog box for creating (US 3) and editing (US 5) a hotel.
+ * The ID is automatically assigned when you save.
+ */
 
 public class HotelDialog extends JDialog {
 
