@@ -178,6 +178,59 @@ public class StatisticsPanel extends JPanel {
         return new JScrollPane(t);
     }
 
-    // load Data
+    private void loadData() {
+        model.setRowCount(0);
+
+        Map<Integer, Hotel> hotelMap = new HashMap<>();
+        for (Hotel h : hotelDAO.findAll()) hotelMap.put(h.getId(), h);
+
+        String view = (String) cbView.getSelectedItem();
+        List<Occupancy> data;
+
+        if ("By hotel".equals(view)) {
+            // US 10: a hotel, dates from/to
+            Hotel h = (Hotel) cbHotel.getSelectedItem();
+            if (h == null) {
+                JOptionPane.showMessageDialog(this, "Please select a hotel.");
+                return;
+            }
+
+            int fromYear  = (Integer) cbFromYear.getSelectedItem();
+            int fromMonth = cbFromMonth.getSelectedIndex() + 1;
+            int toYear    = (Integer) cbToYear.getSelectedItem();
+            int toMonth   = cbToMonth.getSelectedIndex() + 1;
+
+            if ((fromYear * 12 + fromMonth) > (toYear * 12 + toMonth)) {
+                JOptionPane.showMessageDialog(this,
+                        "'From' must be earlier than or equal to 'To'.");
+                return;
+            }
+
+            data = occupancyDAO.findByHotelInRange(
+                    h.getId(), fromYear, fromMonth, toYear, toMonth);
+        } else {
+            // US 2: All hotels, one month
+            int month = cbMonth.getSelectedIndex() + 1;
+            int year  = (Integer) cbYear.getSelectedItem();
+            data = occupancyDAO.findByMonth(year, month);
+        }
+
+        if (data.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No data found.");
+            return;
+        }
+
+        for (Occupancy o : data) {
+            Hotel h = hotelMap.get(o.getHotelId());
+            String name = (h != null) ? h.getName() : "(unknown)";
+            model.addRow(new Object[]{
+                    o.getHotelId(), name, o.getYear(), o.getMonth(),
+                    o.getRooms(), o.getUsedRooms(),
+                    String.format("%.1f", o.getRoomOccupancyPercent()),
+                    o.getBeds(), o.getUsedBeds(),
+                    String.format("%.1f", o.getBedOccupancyPercent())
+            });
+        }
+    }
 
 }
