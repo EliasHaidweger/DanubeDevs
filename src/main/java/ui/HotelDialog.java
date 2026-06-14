@@ -28,7 +28,7 @@ public class HotelDialog extends JDialog {
     private final JTextField tfPhone    = new JTextField();
     private final JTextField tfRooms    = new JTextField("0");
     private final JTextField tfBeds     = new JTextField("0");
-    private final JTextField tfTags     = new JTextField();
+
 
     public HotelDialog(JFrame parent, Hotel hotel) {
         super(parent, true);
@@ -62,7 +62,7 @@ public class HotelDialog extends JDialog {
         p.add(new JLabel("Phone:"));             p.add(tfPhone);
         p.add(new JLabel("Number of Rooms:"));   p.add(tfRooms);
         p.add(new JLabel("Number of Beds:"));    p.add(tfBeds);
-        p.add(new JLabel("Tags (comma sep.):")); p.add(tfTags);
+
         return p;
     }
 
@@ -88,7 +88,7 @@ public class HotelDialog extends JDialog {
         tfPhone.setText(h.getPhone());
         tfRooms.setText(String.valueOf(h.getNoRooms()));
         tfBeds.setText(String.valueOf(h.getNoBeds()));
-        tfTags.setText(h.getTags());
+
     }
 
     private void onSave() {
@@ -109,7 +109,7 @@ public class HotelDialog extends JDialog {
             h.setPhone(tfPhone.getText().trim());
             h.setNoRooms(parseInt(tfRooms.getText()));
             h.setNoBeds(parseInt(tfBeds.getText()));
-            h.setTags(tfTags.getText().trim());
+
 
             if (hotel == null) hotelDAO.save(h);
             else               hotelDAO.update(h);
