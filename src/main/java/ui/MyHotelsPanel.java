@@ -55,7 +55,20 @@ public class MyHotelsPanel extends JPanel {
         return p;
     }
 
-    //US24
+    /** US 24: Loads the hotels assigned to the user. */
+    private void loadData() {
+        model.setRowCount(0);
+        for (Integer id : Session.getMyHotelIds()) {
+            Hotel h = hotelDAO.findById(id);
+            if (h != null) {
+                model.addRow(new Object[]{
+                        h.getId(), h.getName(), h.getCity(),
+                        h.getCategory(), h.getNoRooms(), h.getNoBeds()
+                });
+            }
+        }
+    }
+
 
     /** US 25: Edit your own hotel (only allowed for assigned hotels). */
     private void onEdit() {
