@@ -31,6 +31,13 @@ public class StatisticsPanel extends JPanel {
     private JComboBox<Integer> cbYear;
 
     //Filter 10
+    // Filter for US 10 ("By hotel" with timeperiod)
+    private JComboBox<Hotel>   cbHotel;
+    private JComboBox<String>  cbFromMonth;
+    private JComboBox<Integer> cbFromYear;
+    private JComboBox<String>  cbToMonth;
+    private JComboBox<Integer> cbToYear;
+
 
     // Panels that are shown or hidden depending on the view
     private JPanel monthFilterPanel;
@@ -86,6 +93,29 @@ public class StatisticsPanel extends JPanel {
         main.add(monthFilterPanel);
 
         //row 3:
+        hotelFilterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+        cbHotel = new JComboBox<>();
+        for (Hotel h : hotelDAO.findAll()) cbHotel.addItem(h);
+
+        cbFromMonth = new JComboBox<>(MONTHS);
+        cbFromYear  = makeYearCombo();
+        cbFromYear.setSelectedItem(2000);                 // Default: aeltestes Jahr
+        cbToMonth   = new JComboBox<>(MONTHS);
+        cbToMonth.setSelectedIndex(11);                   // Default: December
+        cbToYear    = makeYearCombo();
+        cbToYear.setSelectedItem(2026);                   // Default: neuestes Jahr
+
+        hotelFilterPanel.add(new JLabel("Hotel:"));
+        hotelFilterPanel.add(cbHotel);
+        hotelFilterPanel.add(new JLabel("  From:"));
+        hotelFilterPanel.add(cbFromMonth);
+        hotelFilterPanel.add(cbFromYear);
+        hotelFilterPanel.add(new JLabel("  To:"));
+        hotelFilterPanel.add(cbToMonth);
+        hotelFilterPanel.add(cbToYear);
+        main.add(hotelFilterPanel);
+
 
         // ====== Row 4: Show ======
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
