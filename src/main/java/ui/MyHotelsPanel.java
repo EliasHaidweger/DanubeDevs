@@ -68,8 +68,6 @@ public class MyHotelsPanel extends JPanel {
             }
         }
     }
-
-
     /** US 25: Edit your own hotel (only allowed for assigned hotels). */
     private void onEdit() {
         int row = table.getSelectedRow();
@@ -91,4 +89,7 @@ public class MyHotelsPanel extends JPanel {
         dialog.setVisible(true);
         if (dialog.wasSaved()) loadData();
     }
+
+
+
 }
