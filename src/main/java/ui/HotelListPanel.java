@@ -69,6 +69,17 @@ public class HotelListPanel extends JPanel {
         return p;
     }
 
+    /** US 4: Load all hotels into the table. */
+    private void loadData() {
+        model.setRowCount(0);
+        for (Hotel h : hotelDAO.findAll()) {
+            model.addRow(new Object[]{
+                    h.getId(), h.getCategory(), h.getName(),
+                    h.getCity(), h.getNoRooms(), h.getNoBeds(), h.getTags()
+            });
+        }
+    }
+
     /** US 3: Create a new hotel. */
     private void onAdd() {
         HotelDialog dialog = new HotelDialog(parentFrame(), null);
