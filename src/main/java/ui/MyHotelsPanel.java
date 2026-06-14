@@ -68,6 +68,28 @@ public class MyHotelsPanel extends JPanel {
             }
         }
     }
+    /** US 25: Edit your own hotel (only allowed for assigned hotels). */
+    private void onEdit() {
+        int row = table.getSelectedRow();
+        if (row < 0) {
+            JOptionPane.showMessageDialog(this, "Please select a hotel first.");
+            return;
+        }
+        int id = (int) model.getValueAt(row, 0);
+
+        if (!Session.getMyHotelIds().contains(id)) {
+            JOptionPane.showMessageDialog(this, "You can only edit your own hotels.");
+            return;
+        }
+
+        Hotel hotel = hotelDAO.findById(id);
+        if (hotel == null) return;
+
+        HotelDialog dialog = new HotelDialog((JFrame) SwingUtilities.getWindowAncestor(this), hotel);
+        dialog.setVisible(true);
+        if (dialog.wasSaved()) loadData();
+    }
+
 
 
 }
