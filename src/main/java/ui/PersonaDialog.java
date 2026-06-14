@@ -68,7 +68,28 @@ public class PersonaDialog extends JDialog {
         cbRole.setSelectedItem(p.getRole());
         chkCanDelete.setSelected(p.isCanDelete());
     }
+    /** US 12/13: Save persona. */
+    private void onSave() {
+        String username = tfUsername.getText().trim();
+        String password = new String(tfPassword.getPassword()).trim();
 
+        if (username.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Username and password are required.");
+            return;
+        }
+
+        Persona p = (persona == null) ? new Persona() : persona;
+        p.setUsername(username);
+        p.setPassword(password);
+        p.setRole((String) cbRole.getSelectedItem());
+        p.setCanDelete(chkCanDelete.isSelected());
+
+        if (persona == null) personaDAO.save(p);
+        else                 personaDAO.update(p);
+
+        saved = true;
+        dispose();
+    }
 
 
     public boolean wasSaved() {
