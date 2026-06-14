@@ -55,7 +55,7 @@ public class MyHotelsPanel extends JPanel {
         return p;
     }
 
-
+    //US24
 
     /** US 25: Edit your own hotel (only allowed for assigned hotels). */
     private void onEdit() {
