@@ -50,4 +50,4 @@ public class HibernateUtil {
     }
 }
 
-//gonna do my own testing
+//backup for if anyone destroys sth
