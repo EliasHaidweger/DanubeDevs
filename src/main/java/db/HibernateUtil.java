@@ -49,3 +49,5 @@ public class HibernateUtil {
         SESSION_FACTORY.close();
     }
 }
+
+//gonna do my own testing
