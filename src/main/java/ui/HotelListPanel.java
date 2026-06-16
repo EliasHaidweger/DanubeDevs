@@ -1,12 +1,15 @@
 package ui;
 
 import db.HotelDAO;
+import db.OccupancyDAO;
 import model.Hotel;
+import model.Occupancy;
 import model.Session;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.List;
 
 /**
  * Hotel Management for Senior Users.
@@ -21,11 +24,12 @@ import java.awt.*;
 public class HotelListPanel extends JPanel {
 
     private final HotelDAO hotelDAO = new HotelDAO();
+    private final OccupancyDAO occupancyDAO = new OccupancyDAO();
     private final DefaultTableModel model;
     private final JTable table;
 
     private static final String[] COLUMNS =
-            {"ID", "Category", "Name", "City", "Rooms", "Beds", "Tags"};
+            {"ID", "Category", "Name", "City", "Rooms","UsedRooms", "Beds", "UsedBeds"};
 
     public HotelListPanel() {
         setLayout(new BorderLayout(5, 5));
@@ -69,10 +73,12 @@ public class HotelListPanel extends JPanel {
     /** US 4: Load all hotels into the table. */
     private void loadData() {
         model.setRowCount(0);
-        for (Hotel h : hotelDAO.findAll()) {
+        for (Hotel h : hotelDAO.findAll().subList(0,40)) {
+            List<Occupancy> helper = occupancyDAO.findByHotel(h.getId());
             model.addRow(new Object[]{
                     h.getId(), h.getCategory(), h.getName(),
-                    h.getCity(), h.getNoRooms(), h.getNoBeds(), h.getTags()
+                    h.getCity(), h.getNoRooms(), (helper != null && !helper.isEmpty())? helper.getFirst().getUsedRooms() : "",
+                    h.getNoBeds(), (helper != null && !helper.isEmpty())? helper.getFirst().getUsedBeds() : "",
             });
         }
     }
