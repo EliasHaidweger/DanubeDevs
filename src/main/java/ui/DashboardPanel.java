@@ -73,8 +73,6 @@ public class DashboardPanel extends JPanel {
 
     /** US 1: Calculates the master data summary and populates the table and totals. */
     private void loadData() {
-        model.setRowCount(0);
-
         Map<String, CategoryStats> byCategory = new LinkedHashMap<>();
         int totalHotels = 0, totalRooms = 0, totalBeds = 0;
 

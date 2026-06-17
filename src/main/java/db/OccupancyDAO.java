@@ -21,11 +21,7 @@ public class OccupancyDAO {
     public List<Occupancy> findByMonth(int year, int month) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.createQuery(
-                    "FROM Occupancy o WHERE o.year = :year AND o.month = :month",
-                    Occupancy.class)
-                    .setParameter("year", year)
-                    .setParameter("month", month)
-                    .list();
+                    "FROM Occupancy o WHERE o.year = :year AND o.month = :month", Occupancy.class).setParameter("year", year).setParameter("month", month).list();
         }
     }
 
@@ -43,12 +39,8 @@ public class OccupancyDAO {
     /** US 10: Hotel occupancy rates for a specific period (from/to month+year). */
     public List<Occupancy> findByHotelInRange(int hotelId, int fromYear, int fromMonth, int toYear, int toMonth) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.createQuery(
-                    "FROM Occupancy o WHERE o.hotelId = :hotelId "
-                  + "AND (o.year * 12 + o.month) >= :from "
-                  + "AND (o.year * 12 + o.month) <= :to "
-                  + "ORDER BY o.year, o.month",
-                    Occupancy.class)
+            return session.createQuery("FROM Occupancy o WHERE o.hotelId = :hotelId " + "AND (o.year * 12 + o.month) >= :from "
+                  + "AND (o.year * 12 + o.month) <= :to " + "ORDER BY o.year, o.month", Occupancy.class)
                     .setParameter("hotelId", hotelId)
                     .setParameter("from", fromYear * 12 + fromMonth)
                     .setParameter("to", toYear * 12 + toMonth)

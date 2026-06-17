@@ -55,10 +55,8 @@ public class HotelDAO {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             Transaction tx = session.beginTransaction();
 
-            session.createMutationQuery("DELETE FROM Occupancy o WHERE o.hotelId = :id")
-                   .setParameter("id", id).executeUpdate();
-            session.createMutationQuery("DELETE FROM PersonaHotel ph WHERE ph.hotelId = :id")
-                   .setParameter("id", id).executeUpdate();
+            session.createMutationQuery("DELETE FROM Occupancy o WHERE o.hotelId = :id").setParameter("id", id).executeUpdate();
+            session.createMutationQuery("DELETE FROM PersonaHotel ph WHERE ph.hotelId = :id").setParameter("id", id).executeUpdate();
 
             Hotel hotel = session.get(Hotel.class, id);
             if (hotel != null) session.remove(hotel);
@@ -70,8 +68,7 @@ public class HotelDAO {
     /** Next available ID (max + 1). This prevents gaps and IDENTITY jumps. */
     private int nextId() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            Integer maxId = session.createQuery("SELECT MAX(h.id) FROM Hotel h", Integer.class)
-                                   .uniqueResult();
+            Integer maxId = session.createQuery("SELECT MAX(h.id) FROM Hotel h", Integer.class).uniqueResult();
             return (maxId == null) ? 1 : maxId + 1;
         }
     }

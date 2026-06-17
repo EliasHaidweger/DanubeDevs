@@ -32,7 +32,7 @@ public class HotelListPanel extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         model = new DefaultTableModel(COLUMNS, 0) {
-            @Override public boolean isCellEditable(int row, int col) { return false; }
+            @Override public boolean isCellEditable(int row, int col) { return true; }
         };
         table = new JTable(model);
         table.setRowHeight(24);

@@ -57,7 +57,7 @@ public class HelpPanel extends JPanel {
                         + "LOG OUT\n"
                         + "  Use the 'Log out' button at the top right to switch persona.\n"
         );
-        text.setEditable(false);
+        text.setEditable(true);
         text.setFont(new Font("Monospaced", Font.PLAIN, 13));
         text.setCaretPosition(0);
 
